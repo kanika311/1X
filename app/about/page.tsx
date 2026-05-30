@@ -5,7 +5,7 @@ import { IMG } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Meet Dr. Ayesha — bridging premium physiotherapy and cybersecurity education.",
+  description: "Meet Dr. Ayesha — bridging premium physiotherapy and cybersecurity.",
 };
 
 export default function AboutPage() {
@@ -26,7 +26,7 @@ export default function AboutPage() {
         </p>
         <p className="mt-10 text-base leading-relaxed text-muted">
           Dr. Ayesha founded 1X to unite two worlds: luxury physiotherapy that restores movement and confidence, and
-          rigorous cybersecurity education that opens doors in a high-demand industry. Every course and therapy session
+          rigorous cybersecurity that opens doors in a high-demand industry. Every course and therapy session
           reflects the same standard — premium, personal, and outcome-driven.
         </p>
       </section>
@@ -55,7 +55,7 @@ export default function AboutPage() {
           <SoftImage src={IMG.drAyesha} alt="Dr. Ayesha" overlay="card" rounded="3xl" sizes="320px" />
         </div>
         <p className="mt-10 text-base leading-relaxed text-muted">
-          Board-certified physiotherapist and cybersecurity program director — Dr. Ayesha personally oversees curriculum
+          Board-certified physiotherapist and cybersecurity program director — Dr. Ayxh personally oversees curriculum
           design and clinical protocols at 1X.
         </p>
       </section>

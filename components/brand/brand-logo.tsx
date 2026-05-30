@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type BrandLogoProps = {
   className?: string;
@@ -21,8 +22,7 @@ export function BrandLogo({ className, size = "md" }: BrandLogoProps) {
         className={cn("inline-flex items-baseline justify-center font-semibold", s.mark)}
         aria-label="1X"
       >
-        <span className="font-sans tabular-nums leading-none">1</span>
-        <span className="font-serif leading-none">X</span>
+        <Image src="/LOGO.jpeg" alt="1X" width={100} height={100} className="w-10 h-10 rounded-full" />
       </span>
     </span>
   );
@@ -32,7 +32,7 @@ export function BrandTagline({ className, size = "md" }: BrandLogoProps) {
   const s = sizeClass[size];
   return (
     <span className={cn("mt-0.5 block font-semibold uppercase text-muted", s.tag, className)}>
-      Dr. Ayesha
+      Dr. Ayxh
     </span>
   );
 }

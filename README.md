@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 1X · Dr. Ayesha
 
 Premium luxury ecommerce-style platform combining **cybersecurity courses** and **physiotherapy services** — inspired by Kylie Cosmetics UI/UX.
@@ -38,3 +39,6 @@ app/              # Routes & layouts
 components/       # UI, layout, home, catalog, chatbot, auth
 lib/              # Data, images, utils
 ```
+=======
+# 1X
+>>>>>>> c1ab12d4a56d0a832e37cfe849e3ad8d5a03b50b
