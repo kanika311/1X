@@ -17,7 +17,7 @@ const FAQ = [
 
 const REPLIES: Record<string, string> = {
   pricing:
-    "Cyber courses start at ₹18,999. Ethical Hacking and SOC Analyst are our bestsellers. Visit /courses for full pricing.",
+    "Cyber courses start at ₹18,999. Ethical Hacking and SOC Analyst are our bestsellers. Visit /services for full pricing.",
   therapy:
     "Book physiotherapy from ₹1,999 per session. Sports Therapy and Pain Relief are most popular. Head to /services to reserve.",
   contact:

@@ -1,41 +1,37 @@
-import { courses } from "@/lib/data/courses";
-import { services } from "@/lib/data/services";
 import type { ProductCardProps } from "@/components/catalog/product-card";
+import {
+  offerings,
+  offeringId,
+  offeringPath,
+  type ServiceOffering,
+} from "@/lib/data/service-catalog";
 
 export type CatalogItem = Pick<
   ProductCardProps,
   "id" | "href" | "title" | "image" | "price" | "rating" | "duration" | "cta" | "bestseller" | "type"
->;
+> & { catalogId: string };
 
-const catalog: CatalogItem[] = [
-  ...courses.map((c) => ({
-    id: c.slug,
-    href: `/courses/${c.slug}`,
-    title: c.title,
-    image: c.image,
-    price: c.price,
-    rating: c.rating,
-    duration: c.duration,
-    cta: "Enroll" as const,
-    bestseller: c.bestseller,
-    type: "course" as const,
-  })),
-  ...services.map((s) => ({
-    id: s.slug,
-    href: `/services/${s.slug}`,
-    title: s.title,
-    image: s.image,
-    price: s.price,
-    rating: s.rating,
-    duration: s.duration,
-    cta: "Book now" as const,
-    bestseller: s.bestseller,
-    type: "service" as const,
-  })),
-];
+function toCatalogItem(o: ServiceOffering): CatalogItem {
+  const isCourse = o.category === "courses";
+  return {
+    catalogId: offeringId(o),
+    id: offeringId(o),
+    href: offeringPath(o),
+    title: o.title,
+    image: o.image,
+    price: o.price,
+    rating: o.rating,
+    duration: o.duration,
+    cta: o.cta,
+    bestseller: o.bestseller,
+    type: isCourse ? "course" : "service",
+  };
+}
+
+const catalog: CatalogItem[] = offerings.map(toCatalogItem);
 
 export function getCatalogItem(id: string): CatalogItem | undefined {
-  return catalog.find((item) => item.id === id);
+  return catalog.find((item) => item.id === id || item.catalogId === id);
 }
 
 export function getWishlistItems(ids: string[]): CatalogItem[] {
@@ -44,7 +40,7 @@ export function getWishlistItems(ids: string[]): CatalogItem[] {
 
 export type CartLineItem = CatalogItem & { cartKey: string };
 
-/** Cart keys are stored as `course:slug` or `service:slug`. */
+/** Cart keys: `course:domain/category/slug` or `service:domain/category/slug` */
 export function parseCartKey(key: string): { type: CatalogItem["type"]; id: string } | null {
   const sep = key.indexOf(":");
   if (sep === -1) return null;

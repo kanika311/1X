@@ -13,9 +13,9 @@ export function DualCta() {
           <div className="absolute inset-0 flex flex-col justify-end p-8 text-white md:p-12">
             <p className="eyebrow !text-rose-100">Cyber</p>
             <h3 className="mt-2 font-serif text-3xl leading-tight">Start Learning</h3>
-            <Link href="/courses" className="mt-6">
+            <Link href="/services" className="mt-6">
               <Button variant="luxury" className="bg-white/95 text-ink hover:bg-white">
-                Explore Courses
+                Explore Services
               </Button>
             </Link>
           </div>

@@ -5,8 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 
-import { courses } from "@/lib/data/courses";
-import { services } from "@/lib/data/services";
+import { offerings, offeringPath, CATEGORY_LABELS, DOMAIN_LABELS } from "@/lib/data/service-catalog";
 
 export function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [q, setQ] = useState("");
@@ -14,13 +13,14 @@ export function SearchModal({ open, onClose }: { open: boolean; onClose: () => v
   const results = useMemo(() => {
     const query = q.trim().toLowerCase();
     if (!query) return [];
-    const c = courses
-      .filter((x) => x.title.toLowerCase().includes(query))
-      .map((x) => ({ type: "course" as const, title: x.title, href: `/courses/${x.slug}` }));
-    const s = services
-      .filter((x) => x.title.toLowerCase().includes(query))
-      .map((x) => ({ type: "service" as const, title: x.title, href: `/services/${x.slug}` }));
-    return [...c, ...s].slice(0, 8);
+    return offerings
+      .filter((x) => x.title.toLowerCase().includes(query) || x.description.toLowerCase().includes(query))
+      .slice(0, 8)
+      .map((x) => ({
+        title: x.title,
+        href: offeringPath(x),
+        type: `${DOMAIN_LABELS[x.domain]} · ${CATEGORY_LABELS[x.category]}`,
+      }));
   }, [q]);
 
   return (
@@ -46,7 +46,7 @@ export function SearchModal({ open, onClose }: { open: boolean; onClose: () => v
                 autoFocus
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search courses & services…"
+                placeholder="Search services…"
                 className="flex-1 bg-transparent text-base text-ink outline-none placeholder:text-subtle"
               />
               <button type="button" onClick={onClose} aria-label="Close search">
@@ -62,10 +62,10 @@ export function SearchModal({ open, onClose }: { open: boolean; onClose: () => v
                     <Link
                       href={r.href}
                       onClick={onClose}
-                      className="flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-lavender-50"
+                      className="flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-rose-50"
                     >
                       <span>{r.title}</span>
-                      <span className="text-[10px] uppercase tracking-widest text-subtle">{r.type}</span>
+                      <span className="text-[10px] uppercase tracking-wide text-subtle">{r.type}</span>
                     </Link>
                   </li>
                 ))

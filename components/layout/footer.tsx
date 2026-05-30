@@ -5,11 +5,9 @@ import { FooterNewsletter } from "@/components/layout/footer-newsletter";
 import { LINKEDIN_PROFILE } from "@/lib/social";
 
 const PRIMARY_LINKS = [
-  { href: "/contact", label: "contact us" },
-  { href: "/courses", label: "courses" },
-  { href: "/services", label: "services" },
+
+  { href: "/offers", label: "gift card" },
   { href: "/cart", label: "order tracking" },
-  { href: "/wishlist", label: "wishlist" },
 ] as const;
 
 const LEGAL_LINKS = [
@@ -56,7 +54,7 @@ export function Footer() {
         </nav>
 
         <p className="mt-10 text-xs lowercase text-subtle">
-          © {year} 1x · dr. ayesha. all rights reserved.
+          © {year} 1x · dr. ayxh. all rights reserved.
         </p>
       </div>
     </footer>

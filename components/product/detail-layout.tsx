@@ -133,8 +133,8 @@ export function ProductDetailLayout(props: DetailProps) {
       </div>
 
       <div className="mt-8 text-center">
-        <Link href={props.type === "course" ? "/courses" : "/services"} className="text-xs font-semibold uppercase tracking-wide text-muted hover:text-ink">
-          ← Back to {props.type === "course" ? "courses" : "services"}
+        <Link href="/services" className="text-xs font-semibold uppercase tracking-wide text-muted hover:text-ink">
+          ← Back to services
         </Link>
       </div>
     </div>

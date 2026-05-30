@@ -90,8 +90,8 @@ export function HeroSlider() {
           transition={{ delay: 0.2 }}
           className="mt-10 flex flex-wrap gap-4"
         >
-          <Link href="/courses">
-            <Button variant="default">Explore Courses</Button>
+          <Link href="/services">
+            <Button variant="default">Explore Services</Button>
           </Link>
           <Link href="/services">
             <Button variant="luxury">Book Therapy</Button>

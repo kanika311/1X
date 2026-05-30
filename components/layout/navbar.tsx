@@ -13,7 +13,7 @@ import { MobileDrawer } from "@/components/layout/mobile-drawer";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/courses", label: "Courses" },
+  { href: "/offers", label: "Offers" },
   { href: "/services", label: "Services" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact Us" },
