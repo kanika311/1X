@@ -40,11 +40,11 @@ export function ServicesHub() {
   return (
     <div>
       <header className="mb-12 text-center">
-        <p className="eyebrow">Our offerings</p>
-        <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">Services</h1>
-        <p className="mx-auto mt-4 max-w-xl text-base text-muted">
+        {/* <p className="eyebrow">Our offerings</p> */}
+        <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">Our Services</h1>
+        {/* <p className="mx-auto mt-4 max-w-xl text-base text-muted">
           Premium cybersecurity courses and managed services — plus expert physiotherapy by Dr. Ayesha.
-        </p>
+        </p> */}
       </header>
 
       <div className="mb-14 flex justify-center px-2">
@@ -90,10 +90,10 @@ export function ServicesHub() {
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className="space-y-16 md:space-y-20"
         >
-          <p className="text-center text-sm text-muted">
+          {/* <p className="text-center text-sm text-muted">
             Showing <span className="font-medium text-ink">{DOMAIN_LABELS[domain]}</span> programs
-          </p>
-          {domain === "physio" ? (
+          </p> */}
+          {/* {domain === "physio" ? (
             <div className="rounded-3xl border border-rose-100 bg-rose-50/60 px-6 py-8 text-center shadow-soft">
               <p className="eyebrow">Techniques we use</p>
               <p className="mt-3 text-sm leading-relaxed text-muted">
@@ -110,7 +110,7 @@ export function ServicesHub() {
                 ))}
               </ul>
             </div>
-          ) : null}
+          ) : null} */}
           {sections.map((section) => (
             <CategorySection
               key={`${domain}-${section.key}`}

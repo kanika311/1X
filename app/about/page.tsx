@@ -1,27 +1,18 @@
 import type { Metadata } from "next";
 
+import { AboutHeroSlider } from "@/components/about/about-hero-slider";
 import { SoftImage } from "@/components/ui/soft-image";
 import { IMG } from "@/lib/images";
-import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Meet Dr. Ayesha — bridging premium physiotherapy and cybersecurity.",
+  description: "Meet Dr. Ayxh — bridging premium physiotherapy and cybersecurity.",
 };
 
 export default function AboutPage() {
   return (
     <article>
-      <section className="relative min-h-[50vh] overflow-hidden">
-        <SoftImage src={IMG.about} alt="Dr. Ayesha wellness studio" overlay="hero" rounded="none" priority sizes="100vw" className="min-h-[50vh]" />
-        <Image src="/cyber.png" alt="1X" width={100} height={100}  />
-        <Image src="/LOGO.jpeg" alt="1X" width={100} height={100}  />
-        <div className="relative mx-auto max-w-4xl px-4 pb-16 pt-32 text-center sm:px-6">
-          <p className="eyebrow">Our story</p>
-          <h1 className="mt-4 font-serif text-4xl text-ink md:text-6xl">Dr. Ayxh</h1>
-          <p className="mt-2 text-sm font-medium uppercase tracking-wide text-muted">Founder · 1X</p>
-        </div>
-      </section>
+      <AboutHeroSlider />
 
       <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
         <p className="font-serif text-2xl leading-relaxed text-ink md:text-3xl">
@@ -29,8 +20,8 @@ export default function AboutPage() {
         </p>
         <p className="mt-10 text-base leading-relaxed text-muted">
           Dr. Ayesha founded 1X to unite two worlds: luxury physiotherapy that restores movement and confidence, and
-          rigorous cybersecurity that opens doors in a high-demand industry. Every services provided by us
-          reflects the same standard — premium, personal, and outcome-driven.
+          rigorous cybersecurity that opens doors in a high-demand industry. Every service we provide reflects the same
+          standard — premium, personal, and outcome-driven.
         </p>
       </section>
 
@@ -58,7 +49,9 @@ export default function AboutPage() {
           <SoftImage src={IMG.drAyesha} alt="Dr. Ayesha" overlay="card" rounded="3xl" sizes="320px" />
         </div>
         <p className="mt-10 text-base leading-relaxed text-muted">
-        Alignment in the body, encryption in the code. Balance is everything. <br></br>Fixing your posture and your passwords. You need both, and that’s why you have 1x by Dr. Ayxh.
+          Alignment in the body, encryption in the code. Balance is everything.
+          <br />
+          Fixing your posture and your passwords. You need both — that&apos;s why you have 1X by Dr. Ayxh.
         </p>
       </section>
     </article>
