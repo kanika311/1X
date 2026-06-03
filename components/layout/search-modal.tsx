@@ -5,9 +5,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 
-import { offerings, offeringPath, CATEGORY_LABELS, DOMAIN_LABELS } from "@/lib/data/service-catalog";
+import { offeringPath, CATEGORY_LABELS, DOMAIN_LABELS } from "@/lib/data/service-catalog";
+import { useCatalog } from "@/components/providers/catalog-provider";
 
 export function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { offerings } = useCatalog();
   const [q, setQ] = useState("");
 
   const results = useMemo(() => {
@@ -21,7 +23,7 @@ export function SearchModal({ open, onClose }: { open: boolean; onClose: () => v
         href: offeringPath(x),
         type: `${DOMAIN_LABELS[x.domain]} · ${CATEGORY_LABELS[x.category]}`,
       }));
-  }, [q]);
+  }, [q, offerings]);
 
   return (
     <AnimatePresence>

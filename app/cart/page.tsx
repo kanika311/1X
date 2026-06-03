@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
+import { RequireAuth } from "@/components/auth/require-auth";
 import { CartContent } from "@/components/cart/cart-content";
 
 export const metadata: Metadata = {
   title: "Shopping Bag",
-  description: "Your selected courses and therapy services at 1X · Dr. Ayesha.",
+  description: "Your selected courses and therapy services at 1X · Dr. Ayxh.",
 };
 
 export default function CartPage() {
@@ -14,11 +15,11 @@ export default function CartPage() {
         <header className="mb-14 text-center">
           <p className="eyebrow">Your selections</p>
           <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">Shopping Bag</h1>
-          <p className="mx-auto mt-4 max-w-xl text-base text-muted">
-            Only the courses and services you have added appear here.
-          </p>
+        
         </header>
-        <CartContent />
+        <RequireAuth>
+          <CartContent />
+        </RequireAuth>
       </div>
     </div>
   );

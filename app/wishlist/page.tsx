@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
+import { RequireAuth } from "@/components/auth/require-auth";
 import { WishlistContent } from "@/components/wishlist/wishlist-content";
 
 export const metadata: Metadata = {
   title: "Wishlist",
-  description: "Your saved courses and therapy services at 1X · Dr. Ayesha.",
+  description: "Your saved courses and therapy services at 1X · Dr. Ayxh.",
 };
 
 export default function WishlistPage() {
@@ -14,11 +15,11 @@ export default function WishlistPage() {
         <header className="mb-14 text-center">
           <p className="eyebrow">Saved for you</p>
           <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">Wishlist</h1>
-          <p className="mx-auto mt-4 max-w-xl text-base text-muted">
-            Only the courses and services you have hearted appear here.
-          </p>
+       
         </header>
-        <WishlistContent />
+        <RequireAuth>
+          <WishlistContent />
+        </RequireAuth>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AuthPanel } from "@/components/auth/auth-panel";
 import { ProfileDetails } from "@/components/profile/profile-details";
@@ -19,7 +19,7 @@ export default function ProfilePage() {
       <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-16">
         <div className="relative hidden aspect-[4/5] shadow-glow lg:block">
           <SoftImage
-            src={IMG.authPhysio}
+            src='/cyber.png'
             alt="Luxury physiotherapy"
             overlay="profile"
             rounded="3xl"

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { ServicesHub } from "@/components/services/services-hub";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Services",
   description:

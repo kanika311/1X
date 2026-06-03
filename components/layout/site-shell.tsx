@@ -3,9 +3,9 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
-import { AmiBot } from "@/components/chatbot/amibot";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
+import { WhatsAppWidget } from "@/components/layout/whatsapp-widget";
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const [scrolled, setScrolled] = useState(false);
@@ -22,7 +22,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <Navbar scrolled={scrolled} />
       <main className="flex-1">{children}</main>
       <Footer />
-      <AmiBot />
+      <WhatsAppWidget />
     </div>
   );
 }

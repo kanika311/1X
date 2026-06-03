@@ -6,17 +6,7 @@ import { FiX } from "react-icons/fi";
 
 import { BrandLogo, BrandTagline } from "@/components/brand/brand-logo";
 import { useAuth } from "@/components/providers/auth-provider";
-
-const LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/offers", label: "Offers" },
-  { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact Us" },
-  { href: "/wishlist", label: "Wishlist" },
-  { href: "/cart", label: "Shopping Bag" },
-  { href: "/profile", label: "Profile" },
-] as const;
+import { FOOTER_LEGAL, MOBILE_NAV } from "@/lib/nav";
 
 export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { session, logout } = useAuth();
@@ -40,8 +30,8 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
               <FiX className="text-2xl" />
             </button>
           </div>
-          <nav className="flex flex-1 flex-col gap-1 px-4 py-6">
-            {LINKS.map(({ href, label }) => (
+          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6">
+            {MOBILE_NAV.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
@@ -51,6 +41,24 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
                 {label}
               </Link>
             ))}
+            <p className="mt-6 px-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-subtle">More</p>
+            {FOOTER_LEGAL.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={onClose}
+                className="rounded-lg px-4 py-3 text-sm capitalize text-muted transition-colors hover:bg-rose-50 hover:text-ink"
+              >
+                {label}
+              </Link>
+            ))}
+            <Link
+              href="/profile"
+              onClick={onClose}
+              className="rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-wide text-muted transition-colors hover:bg-rose-50"
+            >
+              Profile
+            </Link>
           </nav>
           {session ? (
             <div className="border-t border-ink/8 p-6">

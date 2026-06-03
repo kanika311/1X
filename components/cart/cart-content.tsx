@@ -1,18 +1,28 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
+import { useCallback, useMemo, useState } from "react";
 import { FiShoppingBag, FiTrash2 } from "react-icons/fi";
 
+import { CartCheckout } from "@/components/cart/cart-checkout";
+import { CartPromo } from "@/components/cart/cart-promo";
+import { useCatalog } from "@/components/providers/catalog-provider";
 import { useShop } from "@/components/providers/shop-provider";
 import { Button } from "@/components/ui/button";
-import { getCartItems } from "@/lib/catalog";
+import { calcPromoDiscount, calcTotalAfterPromo, type AppliedPromo } from "@/lib/spin-rewards";
 import { formatPrice } from "@/lib/utils";
 
 export function CartContent() {
   const { cart, removeFromCart } = useShop();
+  const { getCartItems } = useCatalog();
+  const [promo, setPromo] = useState<AppliedPromo | null>(null);
+  const onPromoChange = useCallback((p: AppliedPromo | null) => setPromo(p), []);
+
   const items = getCartItems(cart);
   const subtotal = items.reduce((sum, item) => sum + item.price, 0);
+  const discount = promo ? calcPromoDiscount(subtotal, promo.percent) : 0;
+  const total = useMemo(() => calcTotalAfterPromo(subtotal, promo?.percent ?? 0), [subtotal, promo]);
 
   if (items.length === 0) {
     return (
@@ -22,7 +32,7 @@ export function CartContent() {
         </div>
         <h2 className="mt-6 font-serif text-2xl text-ink">Your bag is empty</h2>
         <p className="mt-3 text-base leading-relaxed text-muted">
-          Add programs from the services page — only what you add to cart will appear here.
+          Add programs from the services page ΓÇö only what you add to cart will appear here.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/services">
@@ -67,18 +77,26 @@ export function CartContent() {
         ))}
       </ul>
 
-      <div className="mt-8 rounded-3xl border border-rose-100 bg-rose-50/50 p-6 sm:p-8">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted">Subtotal</span>
-          <span className="font-serif text-2xl text-ink">{formatPrice(subtotal)}</span>
+      <CartPromo subtotal={subtotal} onPromoChange={onPromoChange} />
+
+      <div className="mt-4 space-y-1 rounded-2xl border border-rose-100 bg-rose-50/50 px-4 py-3 text-sm">
+        <div className="flex justify-between text-muted">
+          <span>Subtotal</span>
+          <span>{formatPrice(subtotal)}</span>
         </div>
-        <p className="mt-2 text-sm text-muted">Taxes and booking details confirmed at checkout.</p>
-        <Link href="/contact" className="mt-6 block">
-          <Button variant="default" className="w-full">
-            Proceed to book
-          </Button>
-        </Link>
+        {promo && discount > 0 ? (
+          <div className="flex justify-between text-emerald-700">
+            <span>Promo ({promo.code})</span>
+            <span>−{formatPrice(discount)}</span>
+          </div>
+        ) : null}
+        <div className="flex justify-between border-t border-rose-100/80 pt-2 font-semibold text-ink">
+          <span>Total</span>
+          <span className="font-serif text-lg">{formatPrice(total)}</span>
+        </div>
       </div>
+
+      <CartCheckout items={items} subtotal={subtotal} total={total} promo={promo} discount={discount} />
     </div>
   );
 }

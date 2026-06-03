@@ -7,18 +7,10 @@ import { SoftImage } from "@/components/ui/soft-image";
 import { IMG } from "@/lib/images";
 
 const SLIDES = [
-  {
-    image: IMG.about,
-    alt: "Wellness studio",
-  },
-  {
-    image: "/cyber.png",
-    alt: "Cybersecurity",
-  },
-  {
-    image: '/LOGO.jpeg',
-    alt: "1X",
-  },
+  { image: "/cyber.png", alt: "Cybersecurity" },
+  { image: IMG.about, alt: "Wellness studio" },
+  { image: "/Logo.jpeg", alt: "Dr. Ayxh" },
+
 ] as const;
 
 export function AboutHeroSlider() {
@@ -32,7 +24,9 @@ export function AboutHeroSlider() {
   const slide = SLIDES[index];
 
   return (
-    <section className="relative h-[min(48vh,520px)] w-full overflow-hidden bg-cream">
+    <section className="relative w-full overflow-hidden bg-cream">
+    
+      <div className="relative h-[min(48vh,520px)] w-full">
       <AnimatePresence mode="wait">
         <motion.div
           key={slide.image}
@@ -64,6 +58,7 @@ export function AboutHeroSlider() {
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
+      </div>
       </div>
     </section>
   );

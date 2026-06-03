@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -57,7 +57,7 @@ export function ServiceOfferingCard({ offering, index = 0 }: ServiceOfferingCard
               {offering.cta}
             </Button>
           </Link>
-          <Link href={categoryPath(offering.domain, offering.category)} aria-label={`View all ${offering.category}`}>
+          <Link href={categoryPath(offering.domain, offering.category)} className={`View all ${offering.category}`}>
             <Button variant="outline" size="sm" className="px-3">
               <FiArrowRight />
             </Button>
@@ -87,7 +87,7 @@ export function CategorySection({ label, domain, category, items }: CategorySect
           href={categoryPath(domain, category)}
           className="text-xs font-semibold uppercase tracking-wide text-mauve transition-colors hover:text-mauve-deep"
         >
-          View all →
+          View all ΓåÆ
         </Link>
       </div>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

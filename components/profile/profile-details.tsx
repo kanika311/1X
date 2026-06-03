@@ -1,20 +1,18 @@
 "use client";
 
-import { FiLogOut, FiMail, FiUser } from "react-icons/fi";
+import { FiLogOut, FiMail, FiPhone, FiUser } from "react-icons/fi";
 
 import { BrandLogo, BrandTagline } from "@/components/brand/brand-logo";
 import { useAuth } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
-
 export function ProfileDetails() {
   const { session, logout } = useAuth();
 
   if (!session) return null;
 
-  const displayName =
-    session.type === "guest" ? "Guest" : session.name?.trim() || session.email?.split("@")[0] || "Member";
-  const email = session.type === "guest" ? "Browsing as guest" : session.email ?? "—";
-  const accountLabel = session.type === "guest" ? "Guest account" : "Registered member";
+  const displayName = session.name?.trim() || "Member";
+  const phone = session.number ?? "—";
+  const accountLabel = "Registered member";
 
   return (
     <div className="glass w-full max-w-lg rounded-3xl p-8 shadow-glow sm:p-10">
@@ -40,10 +38,10 @@ export function ProfileDetails() {
           </div>
         </div>
         <div className="flex items-start gap-3 rounded-2xl border border-ink/8 bg-white/60 px-4 py-3.5">
-          <FiMail className="mt-0.5 shrink-0 text-subtle" />
+          <FiPhone className="mt-0.5 shrink-0 text-subtle" />
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-muted">Email</dt>
-            <dd className="mt-0.5 text-base text-ink">{email}</dd>
+            <dt className="text-xs font-semibold uppercase tracking-wide text-muted">Number</dt>
+            <dd className="mt-0.5 text-base text-ink">{phone}</dd>
           </div>
         </div>
       </dl>

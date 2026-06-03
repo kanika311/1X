@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 
@@ -20,7 +20,7 @@ export function FooterNewsletter() {
     <div className="mx-auto w-full max-w-xl">
       <p className="text-sm font-semibold lowercase tracking-wide text-mauve-deep">sign up for updates:</p>
       {done ? (
-        <p className="mt-4 text-sm lowercase text-muted">thank you — you&apos;re on the list.</p>
+        <p className="mt-4 text-sm lowercase text-muted">thank you ΓÇö you&apos;re on the list.</p>
       ) : (
         <form onSubmit={submit} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-stretch">
           <input

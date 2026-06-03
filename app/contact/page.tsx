@@ -2,14 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FiInstagram, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
+import { FiInstagram, FiLinkedin, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
 
 export default function ContactPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
       <header className="mb-14 text-center">
         <p className="eyebrow">Get in touch</p>
-        <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">Consult here for your Cybersecurity and Physiotherapy related queries</h1>
       </header>
 
       <div className="grid gap-14 lg:grid-cols-2">
@@ -38,7 +37,7 @@ export default function ContactPage() {
 
         <div className="space-y-10">
           <div>
-            <h2 className="font-serif text-xl text-ink"> Book a 1-on-1 consult with Dr. Ayxh.</h2>
+            <h2 className="font-serif text-xl text-ink"> Book a 1-on-1 consult/collab with Dr. Ayxh.</h2>
             <p className="mt-3 text-sm text-muted">Slots: Mon–Sat, 7 AM – 7 PM IST</p>
             <Button variant="luxury" className="mt-6">
               Request booking
@@ -60,6 +59,18 @@ export default function ContactPage() {
               <FiMail className="shrink-0" />
               <a href="mailto:contact@1x-dr-ayesha.com" className="hover:text-ink">
                dr.ayxhbusiness@gmail.com
+              </a>
+            </li>
+            <li className="flex gap-3">
+              <FiPhone className="shrink-0" />
+              <a href="#" className="hover:text-ink">
+              +91 6289672438
+              </a>
+            </li>
+            <li className="flex gap-3">
+              <FiLinkedin className="shrink-0" />
+              <a href="https://www.linkedin.com/in/dr-ayxh-baby-ऐश्-abram-aymed-5b388b22b?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer" className="hover:text-ink">
+              LinkedIn Profile
               </a>
             </li>
             {/* <li className="flex gap-3">

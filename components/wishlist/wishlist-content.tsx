@@ -6,10 +6,11 @@ import { FiHeart } from "react-icons/fi";
 import { ProductCard } from "@/components/catalog/product-card";
 import { useShop } from "@/components/providers/shop-provider";
 import { Button } from "@/components/ui/button";
-import { getWishlistItems } from "@/lib/catalog";
+import { useCatalog } from "@/components/providers/catalog-provider";
 
 export function WishlistContent() {
   const { wishlist } = useShop();
+  const { getWishlistItems } = useCatalog();
   const items = getWishlistItems(wishlist);
 
   if (items.length === 0) {
@@ -20,7 +21,7 @@ export function WishlistContent() {
         </div>
         <h2 className="mt-6 font-serif text-2xl text-ink">Your wishlist is empty</h2>
         <p className="mt-3 text-base leading-relaxed text-muted">
-          Tap the heart on any program to save it here — only your favourites will appear.
+          Tap the heart on any program to save it here ΓÇö only your favourites will appear.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/services">

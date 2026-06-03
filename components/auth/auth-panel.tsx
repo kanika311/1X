@@ -1,9 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { FaApple, FaGoogle } from "react-icons/fa";
 
 import { BrandLogo, BrandTagline } from "@/components/brand/brand-logo";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -12,18 +12,46 @@ import { Input } from "@/components/ui/input";
 
 type Mode = "login" | "signup";
 
-export function AuthPanel() {
-  const { login, signup, continueAsGuest } = useAuth();
+function AuthPanelForm() {
+  const { login, signup } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  function afterAuth() {
+    const next = searchParams.get("next");
+    if (next && next.startsWith("/") && !next.startsWith("/login")) {
+      router.push(next);
+      return;
+    }
+    if (typeof window !== "undefined" && window.location.pathname === "/profile") {
+      router.refresh();
+      return;
+    }
+    router.push("/");
+  }
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (mode === "login") login(email);
-    else signup(name, email);
+    setError("");
+    if (!password.trim()) return;
+    setSubmitting(true);
+    const err =
+      mode === "login"
+        ? await login(phone, password)
+        : await signup(name, phone, password);
+    setSubmitting(false);
+    if (err) {
+      setError(err);
+      return;
+    }
+    afterAuth();
   }
 
   return (
@@ -62,11 +90,15 @@ export function AuthPanel() {
           ) : null}
         </AnimatePresence>
         <Input
-          type="email"
-          placeholder="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="tel"
+          inputMode="numeric"
+          autoComplete="tel"
+          placeholder="Phone number (10 digits)"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           required
+          minLength={10}
+          maxLength={15}
         />
         <div className="relative">
           <Input
@@ -75,6 +107,7 @@ export function AuthPanel() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={6}
           />
           <button
             type="button"
@@ -85,33 +118,23 @@ export function AuthPanel() {
             {showPass ? <FiEyeOff /> : <FiEye />}
           </button>
         </div>
-        <Button type="submit" variant="default" className="w-full">
-          {mode === "login" ? "Sign In" : "Create Account"}
+        {error ? <p className="text-sm text-red-500">{error}</p> : null}
+        <Button type="submit" variant="default" className="w-full" disabled={submitting}>
+          {submitting ? "Please wait…" : mode === "login" ? "Sign In" : "Create Account"}
         </Button>
       </form>
 
-      <div className="my-6 flex items-center gap-3">
-        <span className="h-px flex-1 bg-ink/10" />
-        <span className="text-xs uppercase tracking-wide text-muted">or</span>
-        <span className="h-px flex-1 bg-ink/10" />
-      </div>
-
-      <div className="flex gap-3">
-        <Button type="button" variant="outline" className="flex-1" onClick={() => login("guest@1x.com")}>
-          <FaGoogle className="text-base" /> Google
-        </Button>
-        <Button type="button" variant="outline" className="flex-1" onClick={() => login("guest@1x.com")}>
-          <FaApple className="text-base" /> Apple
-        </Button>
-      </div>
-
-      <button
-        type="button"
-        onClick={continueAsGuest}
-        className="mt-6 w-full text-center text-xs font-semibold uppercase tracking-wide text-muted transition-colors hover:text-ink"
-      >
-        Continue as Guest
-      </button>
+      {/* <p className="mt-4 text-center text-[11px] text-muted">
+        Wishlist and bag are saved to your account on our server.
+      </p> */}
     </div>
+  );
+}
+
+export function AuthPanel() {
+  return (
+    <Suspense fallback={<div className="h-64 w-full max-w-md animate-pulse rounded-[1.75rem] bg-rose-100/50" />}>
+      <AuthPanelForm />
+    </Suspense>
   );
 }
