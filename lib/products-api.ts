@@ -6,6 +6,7 @@ import {
   type ServiceOffering,
 } from "@/lib/data/service-catalog";
 import type { ServiceIconKey } from "@/lib/service-icons";
+import { resolveApiMediaUrl } from "@/lib/media-url";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -41,7 +42,7 @@ export function productToOffering(p: ApiProduct): ServiceOffering {
     price: Number(p.price) || 0,
     rating: Number(p.rating) || 4.8,
     reviews: Number(p.reviews) || 0,
-    image: p.image,
+    image: resolveApiMediaUrl(p.image),
     iconKey: (p.iconKey || "shield") as ServiceIconKey,
     bestseller: Boolean(p.bestseller),
     benefits: Array.isArray(p.benefits) ? p.benefits : [],
