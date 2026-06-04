@@ -1,5 +1,7 @@
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API = process.env.NEXT_PUBLIC_API_URL;
 const TOKEN_KEY = "onex-token";
+console.log("NEXT_PUBLIC_API_URL =", process.env.NEXT_PUBLIC_API_URL);
+console.log("API =", API);
 
 export function getAuthToken(): string | null {
   if (typeof window === "undefined") return null;

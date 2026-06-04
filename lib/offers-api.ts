@@ -1,5 +1,6 @@
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-
+const API = process.env.NEXT_PUBLIC_API_URL ;
+console.log("NEXT_PUBLIC_API_URL =", process.env.NEXT_PUBLIC_API_URL);
+console.log("API =", API);
 export const MEMBERSHIP_SLUGS = ["silver-membership", "gold-membership", "diamond-membership"] as const;
 
 export type MembershipOffer = {

@@ -1,6 +1,6 @@
 import { getAuthToken } from "@/lib/api-client";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 export type OrderItemPayload = {
   cartKey: string;

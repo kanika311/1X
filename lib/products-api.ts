@@ -7,7 +7,7 @@ import {
 } from "@/lib/data/service-catalog";
 import type { ServiceIconKey } from "@/lib/service-icons";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 export type ApiProduct = {
   _id: string;
