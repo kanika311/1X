@@ -87,7 +87,7 @@ export function CategorySection({ label, domain, category, items }: CategorySect
           href={categoryPath(domain, category)}
           className="text-xs font-semibold uppercase tracking-wide text-mauve transition-colors hover:text-mauve-deep"
         >
-          View all ΓåÆ
+          View all 
         </Link>
       </div>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

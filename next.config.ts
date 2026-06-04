@@ -8,9 +8,23 @@ const nextConfig: NextConfig = {
       { source: "/about", destination: "/", permanent: true },
     ];
   },
+
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+
+      // Render backend
+      {
+        protocol: "https",
+        hostname: "onex-backend-7p9r.onrender.com",
+        pathname: "/uploads/**",
+      },
+
+      // Local development
       {
         protocol: "http",
         hostname: "localhost",
