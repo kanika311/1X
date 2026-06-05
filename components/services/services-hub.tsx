@@ -36,7 +36,7 @@ export function ServicesHub() {
   return (
     <div>
       <header className=" text-center">
-        <h1 className=" font-serif text-4xl text-ink md:text-5xl">Our Services</h1>
+        <h1 className=" text-4xl text-ink md:text-5xl">Our Services</h1>
       
       </header>
 

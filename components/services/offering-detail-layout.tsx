@@ -43,7 +43,7 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-3 font-serif text-4xl text-ink md:text-5xl"
+            className="mt-3  text-4xl text-ink md:text-5xl"
           >
             {offering.title}
           </motion.h1>
@@ -58,7 +58,7 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
 
       <section className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
         <div>
-          <h2 className="font-serif text-2xl text-ink">Overview</h2>
+          <h2 className=" text-2xl text-ink">Overview</h2>
           <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">{offering.description}</p>
           <p className="mt-6 text-2xl font-semibold text-ink">{formatPrice(offering.price)}</p>
           <p className="mt-1 text-sm text-subtle">{offering.duration}</p>
@@ -70,7 +70,7 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
           </div>
         </div>
         <div>
-          <h2 className="font-serif text-2xl text-ink">Benefits</h2>
+          <h2 className="text-2xl text-ink">Benefits</h2>
           <ul className="mt-6 space-y-3">
             {offering.benefits.map((b) => (
               <li key={b} className="flex items-start gap-3 rounded-2xl border border-rose-100/80 bg-white/60 p-4">
@@ -85,7 +85,7 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
       <Testimonials />
 
       <section className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <h2 className="text-center font-serif text-2xl text-ink">FAQ</h2>
+        <h2 className="text-center  text-2xl text-ink">FAQ</h2>
         <dl className="mt-10 space-y-8">
           {offering.faq.map(({ q, a }) => (
             <div key={q} className="border-b border-rose-100 pb-6">
@@ -98,7 +98,7 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
 
       <section className="mx-auto max-w-3xl px-4 pb-20 text-center sm:px-6">
         <div className="rounded-3xl border border-rose-100 bg-gradient-to-br from-rose-50 via-white to-peach-100 p-10 shadow-glow">
-          <h2 className="font-serif text-2xl text-ink">Start your journey</h2>
+          <h2 className="text-2xl text-ink">Start your journey</h2>
           <p className="mt-3 text-muted">Book {offering.title} or speak with our team for a personalized plan.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/contact">

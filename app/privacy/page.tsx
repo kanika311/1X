@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
 
-import { LegalPage } from "@/components/legal/legal-page";
+import { LegalPageDynamic } from "@/components/legal/legal-page-dynamic";
+import { fetchSiteContent } from "@/lib/site-content-api";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How 1X · Dr. Ayxh collects and protects your personal information.",
 };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const content = await fetchSiteContent();
   return (
-    <LegalPage
-      title="Privacy Policy"
-      intro="We respect your privacy. This policy explains what we collect when you browse, book, or purchase through 1X."
-      sections={[
+    <LegalPageDynamic
+      doc={content?.privacy}
+      fallbackTitle="Privacy Policy"
+      fallbackIntro="We respect your privacy. This policy explains what we collect when you browse, book, or purchase through 1X."
+      fallbackSections={[
         {
           heading: "Information we collect",
           body: "We may collect your name, email, phone, order details, and messages you send via contact forms or our Ami chat assistant.",

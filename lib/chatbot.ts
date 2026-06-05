@@ -17,36 +17,110 @@ export const CHAT_QUICK_ACTIONS = [
   { label: "Feedback", key: "feedback" },
 ] as const;
 
-export const CHAT_REPLIES: Record<string, string> = {
+export const CHAT_REPLIES = {
   pricing:
-    "Cyber courses start at ₹18,999. Ethical Hacking and SOC Analyst are our bestsellers. Visit /services for full pricing.",
-  therapy:
-    "Book physiotherapy from ₹1,999 per session. Sports Therapy and Pain Relief are most popular. Head to /services to reserve.",
-  contact:
-    `Reach us at ${CHAT_EMAIL} or use the Contact page for appointments. We respond within 24 hours.`,
-  demo:
-    "Free demo classes run every Saturday for SOC Analyst and Posture Correction. Register via the Contact form.",
-  consult:
-    "Dr. Ayxh offers hybrid wellness + cyber career consultations on Tue & Thu, 4–7 PM IST.",
-  cert:
-    "All courses include industry-aligned certificates upon completion and capstone project review.",
-  gift:
-    "Gift cards and founding member benefits are on our Gift Cards page — exclusive wellness and cyber perks.",
-  feedback:
-    `Thank you for wanting to share feedback! Tell us what you loved or what we can improve — use the Contact page or email ${CHAT_EMAIL}. We read every message.`,
-  default: CHAT_GREETING,
-};
+    "Course fees vary by program. Please visit our Courses section to view current pricing, offers, and enrollment details, or contact us for personalized guidance.",
 
+  therapy:
+    "Book physiotherapy sessions from ₹1,999. Sports Therapy, Pain Relief, and Rehabilitation plans are available. Visit our Services page to schedule an appointment.",
+
+  contact:
+    `Reach us at ${CHAT_EMAIL} or use our Contact page. Our team typically responds within 24 hours.`,
+
+  demo:
+    "Free demo classes are available every Saturday for Cybersecurity and Wellness programs. Contact us to reserve your seat.",
+
+  consult:
+    "Dr. Ayxh offers wellness and cybersecurity consultations on Tuesdays and Thursdays from 4 PM to 7 PM IST.",
+
+  cert:
+    "All professional courses include an industry-aligned certificate upon successful completion and project evaluation.",
+
+  gift:
+    "Explore our Gift Cards page for wellness sessions, course vouchers, and exclusive member benefits.",
+
+  feedback:
+    `We value your feedback! Please use our Contact page or email ${CHAT_EMAIL} to share your suggestions and experience.`,
+
+  default: CHAT_GREETING,
+} as const;
+
+/**
+ * Used for typed messages
+ */
 export function getChatReply(text: string): string {
-  const lower = text.toLowerCase();
-  if (lower.includes("price") || lower.includes("cost")) return CHAT_REPLIES.pricing;
-  if (lower.includes("therapy") || lower.includes("book")) return CHAT_REPLIES.therapy;
-  if (lower.includes("contact") || lower.includes("email")) return CHAT_REPLIES.contact;
-  if (lower.includes("demo")) return CHAT_REPLIES.demo;
-  if (lower.includes("consult")) return CHAT_REPLIES.consult;
-  if (lower.includes("cert")) return CHAT_REPLIES.cert;
-  if (lower.includes("gift")) return CHAT_REPLIES.gift;
-  if (lower.includes("feedback") || lower.includes("review") || lower.includes("suggest"))
+  const lower = text.toLowerCase().trim();
+
+  if (
+    lower.includes("price") ||
+    lower.includes("pricing") ||
+    lower.includes("course") ||
+    lower.includes("fees")
+  ) {
+    return CHAT_REPLIES.pricing;
+  }
+
+  if (
+    lower.includes("therapy") ||
+    lower.includes("book") ||
+    lower.includes("appointment")
+  ) {
+    return CHAT_REPLIES.therapy;
+  }
+
+  if (
+    lower.includes("contact") ||
+    lower.includes("support") ||
+    lower.includes("email")
+  ) {
+    return CHAT_REPLIES.contact;
+  }
+
+  if (
+    lower.includes("demo") ||
+    lower.includes("class")
+  ) {
+    return CHAT_REPLIES.demo;
+  }
+
+  if (
+    lower.includes("consult") ||
+    lower.includes("consultation")
+  ) {
+    return CHAT_REPLIES.consult;
+  }
+
+  if (
+    lower.includes("certificate") ||
+    lower.includes("cert")
+  ) {
+    return CHAT_REPLIES.cert;
+  }
+
+  if (
+    lower.includes("gift") ||
+    lower.includes("card")
+  ) {
+    return CHAT_REPLIES.gift;
+  }
+
+  if (
+    lower.includes("feedback") ||
+    lower.includes("review") ||
+    lower.includes("suggestion")
+  ) {
     return CHAT_REPLIES.feedback;
+  }
+
   return CHAT_REPLIES.default;
+}
+
+/**
+ * Used for quick action buttons
+ */
+export function getQuickActionReply(key: string): string {
+  return (
+    CHAT_REPLIES[key as keyof typeof CHAT_REPLIES] ||
+    CHAT_REPLIES.default
+  );
 }

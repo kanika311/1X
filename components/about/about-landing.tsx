@@ -12,7 +12,7 @@ export function AboutLanding() {
         {/* <p className="font-serif text-2xl leading-relaxed text-ink md:text-3xl">
           Where clinical excellence meets digital defense — one vision for whole-person wellness.
         </p> */}
-          <p className="mt-10 text-cente font-serif text-2xl leading-relaxed text-ink">
+          <p className="mt-10 text-cente  text-2xl leading-relaxed text-ink">
           Dr. Ayxh founded 1X to unite two worlds: luxury physiotherapy that restores movement and confidence, and
           rigorous cybersecurity that opens doors in a high-demand industry. Every service we provide reflects the same
           standard — premium, personal, and outcome-driven.
@@ -26,16 +26,16 @@ export function AboutLanding() {
       </section>
 
       <section className="bg-gradient-to-b from-rose-50/50 to-cream py-20">
-        <div className="mx-auto grid max-w-5xl gap-12 px-4 md:grid-cols-2 md:gap-16 sm:px-6">
-          <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-8 shadow-soft">
-            <h2 className="font-serif text-2xl text-ink">Mission</h2>
+        <div className="mx-auto w-[40%] px-4 sm:px-6">
+          {/* <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-8 shadow-soft">
+            <h2 className="text-2xl text-ink">Mission</h2>
             <p className="mt-4 text-base leading-relaxed text-muted">
               Empower individuals to heal physically and grow professionally — through evidence-based therapy and
               industry-aligned cyber training.
             </p>
-          </div>
+          </div> */}
           <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-8 shadow-soft">
-            <h2 className="font-serif text-2xl text-ink">Vision</h2>
+            <h2 className=" text-2xl text-ink">Vision</h2>
             <p className="mt-4 text-base leading-relaxed text-muted">
               A world where wellness and digital literacy are equally accessible, delivered with the care of a luxury
               brand and the rigor of experts.

@@ -96,7 +96,7 @@ export function ReferralLinkModal({ open, onClose }: Props) {
                 <FiX />
               </button>
               <p className="text-[10px] font-medium uppercase tracking-wider text-rose-100/90">Refer friends</p>
-              <h2 id="referral-modal-title" className="font-serif text-lg leading-tight">
+              <h2 id="referral-modal-title" className=" text-lg leading-tight">
                 Your referral link
               </h2>
             </div>

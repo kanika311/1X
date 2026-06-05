@@ -25,7 +25,7 @@ export default function ProfilePage() {
             rounded="3xl"
             sizes="50vw"
           />
-          <p className="absolute bottom-8 left-8 right-8 z-10 font-serif text-2xl leading-snug text-white drop-shadow-sm">
+          <p className="absolute bottom-8 left-8 right-8 z-10  text-2xl leading-snug text-white drop-shadow-sm">
             Your account — courses, bookings, and care in one place.
           </p>
         </div>

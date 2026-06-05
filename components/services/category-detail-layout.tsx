@@ -26,7 +26,7 @@ export function CategoryDetailLayout({ meta, offerings }: CategoryDetailLayoutPr
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 font-serif text-4xl text-ink md:text-5xl"
+            className="mt-4 text-4xl text-ink md:text-5xl"
           >
             {meta.title}
           </motion.h1>
@@ -34,13 +34,13 @@ export function CategoryDetailLayout({ meta, offerings }: CategoryDetailLayoutPr
       </section>
 
       <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
-        <h2 className="font-serif text-2xl text-ink md:text-3xl">Overview</h2>
+        <h2 className=" text-2xl text-ink md:text-3xl">Overview</h2>
         <p className="mt-6 text-base leading-relaxed text-muted md:text-lg">{meta.overview}</p>
       </section>
 
       <section className="bg-gradient-to-b from-rose-50/50 to-cream py-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="text-center font-serif text-2xl text-ink md:text-3xl">Benefits</h2>
+          <h2 className="text-center  text-2xl text-ink md:text-3xl">Benefits</h2>
           <ul className="mt-10 grid gap-4 sm:grid-cols-2">
             {meta.benefits.map((b) => (
               <li
@@ -56,7 +56,7 @@ export function CategoryDetailLayout({ meta, offerings }: CategoryDetailLayoutPr
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 className="mb-10 text-center font-serif text-2xl text-ink md:text-3xl">Programs</h2>
+        <h2 className="mb-10 text-center text-2xl text-ink md:text-3xl">Programs</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {offerings.map((o, i) => (
             <ServiceOfferingCard key={offeringPath(o)} offering={o} index={i} />
@@ -67,7 +67,7 @@ export function CategoryDetailLayout({ meta, offerings }: CategoryDetailLayoutPr
       <Testimonials />
 
       <section className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <h2 className="text-center font-serif text-2xl text-ink">FAQ</h2>
+        <h2 className="text-center  text-2xl text-ink">FAQ</h2>
         <dl className="mt-10 space-y-8">
           {meta.faq.map(({ q, a }) => (
             <div key={q} className="border-b border-rose-100 pb-6">
@@ -85,7 +85,7 @@ export function CategoryDetailLayout({ meta, offerings }: CategoryDetailLayoutPr
               <FiStar key={i} className="fill-current" />
             ))}
           </div>
-          <h2 className="mt-4 font-serif text-2xl text-ink">Ready to begin?</h2>
+          <h2 className="mt-4  text-2xl text-ink">Ready to begin?</h2>
           <p className="mt-3 text-muted">Book a consultation or explore individual programs below.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/contact">

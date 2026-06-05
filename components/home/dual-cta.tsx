@@ -12,7 +12,7 @@ export function DualCta() {
           <SoftImage src={IMG.heroCyber} alt="Cybersecurity courses" overlay="cta" rounded="none" sizes="50vw" />
           <div className="absolute inset-0 flex flex-col justify-end p-8 text-white md:p-12">
             <p className="eyebrow !text-rose-100">Cyber</p>
-            <h3 className="mt-2 font-serif text-3xl leading-tight">Start Learning</h3>
+            <h3 className="mt-2  text-3xl leading-tight">Start Learning</h3>
             <Link href="/services" className="mt-6">
               <Button variant="luxury" className="bg-white/95 text-ink hover:bg-white">
                 Explore Services
@@ -24,7 +24,7 @@ export function DualCta() {
           <SoftImage src={IMG.heroWellness} alt="Physiotherapy" overlay="cta" rounded="none" sizes="50vw" />
           <div className="absolute inset-0 flex flex-col justify-end p-8 text-white md:p-12">
             <p className="eyebrow !text-rose-100">Wellness</p>
-            <h3 className="mt-2 font-serif text-3xl leading-tight">Book Therapy</h3>
+            <h3 className="mt-2  text-3xl leading-tight">Book Therapy</h3>
             <Link href="/services" className="mt-6">
               <Button variant="luxury" className="bg-white/95 text-ink hover:bg-white">
                 View Services

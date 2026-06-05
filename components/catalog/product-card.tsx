@@ -82,7 +82,7 @@ export function ProductCard({
       <div className="mt-5 space-y-2 text-center sm:text-left">
         <p className="text-xs font-medium uppercase tracking-wide text-muted">{duration}</p>
         <Link href={href}>
-          <h3 className="font-serif text-xl leading-snug text-ink transition-colors group-hover:text-mauve-deep">{title}</h3>
+          <h3 className=" text-xl leading-snug text-ink transition-colors group-hover:text-mauve-deep">{title}</h3>
         </Link>
         <div className="flex items-center justify-center gap-1 sm:justify-start">
           <FiStar className="fill-rose-300 text-rose-400" />

@@ -44,7 +44,7 @@ export function AboutHeroSlider() {
 
       <div className="relative mx-auto flex h-full max-w-4xl flex-col items-center justify-end px-4 pb-14 pt-20 text-center sm:px-6">
         <p className="eyebrow text-white/90">Our story</p>
-        <h1 className="mt-3 font-serif text-4xl text-white md:text-5xl lg:text-6xl">Dr. Ayxh</h1>
+        <h1 className="mt-3 text-4xl text-white md:text-5xl lg:text-6xl">Dr. Ayxh</h1>
         <p className="mt-2 text-sm font-medium uppercase tracking-[0.2em] text-white/85">Founder · 1X</p>
       </div>
 

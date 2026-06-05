@@ -42,7 +42,7 @@ export function ServiceOfferingCard({ offering, index = 0 }: ServiceOfferingCard
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <Link href={offeringPath(offering)}>
-          <h3 className="font-serif text-xl leading-snug text-ink transition-colors group-hover:text-mauve-deep">
+          <h3 className=" text-xl leading-snug text-ink transition-colors group-hover:text-mauve-deep">
             {offering.title}
           </h3>
         </Link>
@@ -81,7 +81,7 @@ export function CategorySection({ label, domain, category, items }: CategorySect
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">{label}</p>
-          <h2 className="mt-1 font-serif text-2xl text-ink md:text-3xl">{label}</h2>
+          <h2 className="mt-1 text-2xl text-ink md:text-3xl">{label}</h2>
         </div>
         <Link
           href={categoryPath(domain, category)}

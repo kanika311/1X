@@ -42,7 +42,7 @@ export function AboutChatbotSection() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="text-center">
           <p className="eyebrow">1X Assistant</p>
-          <h2 className="mt-2 font-serif text-3xl text-ink md:text-4xl">
+          <h2 className="mt-2  text-3xl text-ink md:text-4xl">
             Chat with {CHAT_NAME}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted">

@@ -29,7 +29,7 @@ function SectionHeading({
   return (
     <div className={cn("mx-auto max-w-2xl text-center", className)}>
       {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-      <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">{title}</h2>
+      <h2 className="mt-3  text-3xl text-ink md:text-4xl">{title}</h2>
       {description ? <p className="mt-4 text-base leading-relaxed text-muted">{description}</p> : null}
     </div>
   );
@@ -73,7 +73,7 @@ function OfferCard({
         className,
       )}
     >
-      <h3 className="font-serif text-xl text-ink md:text-2xl">{title}</h3>
+      <h3 className=" text-xl text-ink md:text-2xl">{title}</h3>
       {description ? <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">{description}</p> : null}
       {children}
     </motion.div>
@@ -95,7 +95,7 @@ function OffersHero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08 }}
-          className="mt-4 font-serif text-4xl leading-tight text-ink md:text-6xl"
+          className="mt-4  text-4xl leading-tight text-ink md:text-6xl"
         >
           Gift Cards & Founding Member Benefits
         </motion.h1>
@@ -136,7 +136,7 @@ function First100Offer() {
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-rose-200/80 bg-white/60 px-5 py-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-mauve">Spots remaining</p>
-              <p className="font-serif text-3xl text-ink">{spotsLeft}</p>
+              <p className=" text-3xl text-ink">{spotsLeft}</p>
             </div>
             <div className="text-right">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Offer ends in</p>
@@ -174,7 +174,7 @@ function DailyWellness() {
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, i) => (
           <OfferCard key={card.title} title={card.title} description={card.desc} className="text-center">
-            <div className="mx-auto mt-4 flex size-12 items-center justify-center rounded-2xl bg-rose-50 font-serif text-xl text-mauve">
+            <div className="mx-auto mt-4 flex size-12 items-center justify-center rounded-2xl bg-rose-50 text-xl text-mauve">
               {i + 1}
             </div>
           </OfferCard>
@@ -281,11 +281,11 @@ function InviteFriends() {
           When a friend joins through your referral, you both unlock exclusive savings and loyalty rewards.
         </p>
         <div className="mt-8 flex items-center justify-center gap-6">
-          <div className="flex size-20 items-center justify-center rounded-full border-2 border-rose-200 bg-rose-50 font-serif text-2xl text-mauve">
+          <div className="flex size-20 items-center justify-center rounded-full border-2 border-rose-200 bg-rose-50  text-2xl text-mauve">
             You
           </div>
           <div className="flex size-10 items-center justify-center rounded-full bg-mauve text-white">+</div>
-          <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-rose-300 bg-white font-serif text-2xl text-mauve">
+          <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-rose-300 bg-white text-2xl text-mauve">
             Friend
           </div>
         </div>
@@ -332,7 +332,7 @@ function OffersCta() {
   return (
     <section className="mx-auto max-w-3xl px-4 pb-24 pt-8 text-center sm:px-6">
       <div className="glass rounded-3xl border border-rose-100 p-10 shadow-glow">
-        <h2 className="font-serif text-3xl text-ink">Ready to join?</h2>
+        <h2 className="text-3xl text-ink">Ready to join?</h2>
         <p className="mt-4 text-muted">Secure your founding member spot — limited to the first 100.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/contact">

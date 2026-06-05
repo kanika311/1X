@@ -67,7 +67,7 @@ export function ProductDetailLayout(props: DetailProps) {
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
           {props.bestseller ? <Badge className="mb-4">Bestseller</Badge> : null}
           <p className="text-xs font-medium uppercase tracking-wide text-muted">{props.duration}</p>
-          <h1 className="mt-2 font-serif text-4xl text-ink md:text-5xl">{props.title}</h1>
+          <h1 className="mt-2  text-4xl text-ink md:text-5xl">{props.title}</h1>
           <div className="mt-4 flex items-center gap-2">
             <FiStar className="fill-amber-500 text-amber-500" />
             <span className="text-base font-medium text-ink">

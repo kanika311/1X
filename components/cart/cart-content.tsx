@@ -30,7 +30,7 @@ export function CartContent() {
         <div className="flex size-16 items-center justify-center rounded-full bg-rose-50 text-mauve">
           <FiShoppingBag className="text-3xl" />
         </div>
-        <h2 className="mt-6 font-serif text-2xl text-ink">Your bag is empty</h2>
+        <h2 className="mt-6  text-2xl text-ink">Your bag is empty</h2>
         <p className="mt-3 text-base leading-relaxed text-muted">
           Add programs from the services page ΓÇö only what you add to cart will appear here.
         </p>
@@ -57,7 +57,7 @@ export function CartContent() {
                   {item.type === "course" ? "Course" : "Service"}
                 </p>
                 <Link href={item.href}>
-                  <h3 className="mt-1 font-serif text-lg leading-snug text-ink hover:text-mauve">{item.title}</h3>
+                  <h3 className="mt-1  text-lg leading-snug text-ink hover:text-mauve">{item.title}</h3>
                 </Link>
                 <p className="mt-1 text-xs text-muted">{item.duration}</p>
               </div>
@@ -92,7 +92,7 @@ export function CartContent() {
         ) : null}
         <div className="flex justify-between border-t border-rose-100/80 pt-2 font-semibold text-ink">
           <span>Total</span>
-          <span className="font-serif text-lg">{formatPrice(total)}</span>
+          <span className=" text-lg">{formatPrice(total)}</span>
         </div>
       </div>
 

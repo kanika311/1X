@@ -13,7 +13,7 @@ const REVIEWS = [
   },
   {
     quote:
-      "Dr. Ayesha’s sports therapy program transformed my recovery after ACL surgery. Truly luxury care.",
+      "Dr. Ayxh sports therapy program transformed my recovery after ACL surgery. Truly luxury care.",
     name: "Priya Sharma",
     role: "Athlete · Pain Relief Client",
   },
@@ -49,7 +49,7 @@ export function Testimonials() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
-          className="mt-10 font-serif text-2xl leading-relaxed text-ink md:text-3xl"
+          className="mt-10  text-2xl leading-relaxed text-ink md:text-3xl"
         >
           &ldquo;{r.quote}&rdquo;
         </motion.blockquote>

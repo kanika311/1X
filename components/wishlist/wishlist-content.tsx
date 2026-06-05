@@ -19,7 +19,7 @@ export function WishlistContent() {
         <div className="flex size-16 items-center justify-center rounded-full bg-rose-50 text-rose-400">
           <FiHeart className="text-3xl" />
         </div>
-        <h2 className="mt-6 font-serif text-2xl text-ink">Your wishlist is empty</h2>
+        <h2 className="mt-6  text-2xl text-ink">Your wishlist is empty</h2>
         <p className="mt-3 text-base leading-relaxed text-muted">
           Tap the heart on any program to save it here ΓÇö only your favourites will appear.
         </p>

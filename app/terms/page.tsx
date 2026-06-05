@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
 
-import { LegalPage } from "@/components/legal/legal-page";
+import { LegalPageDynamic } from "@/components/legal/legal-page-dynamic";
+import { fetchSiteContent } from "@/lib/site-content-api";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions",
   description: "Terms of use for 1X · Dr. Ayxh website, courses, and services.",
 };
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const content = await fetchSiteContent();
   return (
-    <LegalPage
-      title="Terms & Conditions"
-      intro="By using this website and purchasing programs or therapy, you agree to the following terms."
-      sections={[
+    <LegalPageDynamic
+      doc={content?.terms}
+      fallbackTitle="Terms & Conditions"
+      fallbackIntro="By using this website and purchasing programs or therapy, you agree to the following terms."
+      fallbackSections={[
         {
           heading: "Services",
           body: "Course content, pricing, and therapy availability may change. Descriptions on the site are for information; final booking terms are confirmed at checkout or consultation.",

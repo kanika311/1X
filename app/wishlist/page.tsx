@@ -14,7 +14,7 @@ export default function WishlistPage() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <header className="mb-14 text-center">
           <p className="eyebrow">Saved for you</p>
-          <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">Wishlist</h1>
+          <h1 className="mt-3  text-4xl text-ink md:text-5xl">Wishlist</h1>
        
         </header>
         <RequireAuth>

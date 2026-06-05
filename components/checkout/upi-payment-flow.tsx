@@ -91,11 +91,11 @@ function CheckoutHeader({
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-medium uppercase tracking-wider text-rose-100/90">Checkout</p>
-            <h2 id="upi-checkout-title" className="truncate font-serif text-sm leading-tight">
+            <h2 id="upi-checkout-title" className="truncate f text-sm leading-tight">
               {orderLabel}
             </h2>
           </div>
-          <p className="shrink-0 font-serif text-xl leading-none">{formatPrice(subtotal)}</p>
+          <p className="shrink-0  text-xl leading-none">{formatPrice(subtotal)}</p>
         </div>
         <div className="mt-2">
           <StepDots step={step} compact />
@@ -119,10 +119,10 @@ function CheckoutHeader({
       <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-rose-100/90">
         Membership checkout
       </p>
-      <h2 id="upi-checkout-title" className="mt-2 text-center font-serif text-2xl">
+      <h2 id="upi-checkout-title" className="mt-2 text-center  text-2xl">
         {orderLabel}
       </h2>
-      <p className="mt-3 text-center font-serif text-4xl tracking-tight">{formatPrice(subtotal)}</p>
+      <p className="mt-3 text-center  text-4xl tracking-tight">{formatPrice(subtotal)}</p>
       <p className="mt-1 text-center text-xs text-rose-100/80">One-time payment via UPI</p>
       <div className="mt-6">
         <StepDots step={step} />
@@ -257,7 +257,7 @@ export function UpiPaymentFlow({
           >
             <FiCheck className={isModal ? "text-xl" : "text-2xl"} />
           </div>
-          <h3 className={cn("font-serif text-ink", isModal ? "mt-2 text-lg" : "mt-4 text-2xl")}>
+          <h3 className={cn("text-ink", isModal ? "mt-2 text-lg" : "mt-4 text-2xl")}>
             Thank you, {name.split(" ")[0]}
           </h3>
           <p className={cn("leading-relaxed text-muted", isModal ? "mt-1 text-xs" : "mt-2 text-sm")}>
@@ -289,7 +289,7 @@ export function UpiPaymentFlow({
             <div className={cn("flex items-center gap-2", isModal ? "mb-2" : "mb-4 gap-3")}>
               <div
                 className={cn(
-                  "flex items-center justify-center rounded-full bg-gradient-to-br from-rose-200 to-mauve/40 font-serif text-mauve-deep",
+                  "flex items-center justify-center rounded-full bg-gradient-to-br from-rose-200 to-mauve/40 text-mauve-deep",
                   isModal ? "size-8 text-sm" : "size-11 text-lg",
                 )}
               >
@@ -512,7 +512,7 @@ export function UpiPaymentFlow({
           ) : null}
           <div className="mt-1 flex items-center justify-between">
             <span className="text-sm text-muted">Order total</span>
-            <span className="font-serif text-2xl text-ink">{formatPrice(subtotal)}</span>
+            <span className=" text-2xl text-ink">{formatPrice(subtotal)}</span>
           </div>
         </div>
         <Button variant="default" className="mt-6 w-full" size="lg" onClick={() => setOpen(true)}>

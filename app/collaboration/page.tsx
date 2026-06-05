@@ -9,7 +9,7 @@ export default function CollaborationPage() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:py-20">
       <p className="eyebrow">Partnerships</p>
-      <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">Business collaboration</h1>
+      <h1 className="mt-3  text-4xl text-ink md:text-5xl">Business collaboration</h1>
       <p className="mt-6 text-base leading-relaxed text-muted">
         We work with clinics, gyms, universities, and enterprises for bulk therapy packages, cybersecurity upskilling,
         co-branded gift cards, and sponsored programs.
@@ -38,7 +38,7 @@ export default function CollaborationPage() {
           alert("Thank you — our partnerships team will reach out within 2 business days.");
         }}
       >
-        <h2 className="font-serif text-xl text-ink">Propose a collaboration</h2>
+        <h2 className="text-xl text-ink">Propose a collaboration</h2>
         <Input name="company" placeholder="Company / organisation" required />
         <Input name="name" placeholder="Your name" required />
         <Input name="email" type="email" placeholder="Work email" required />

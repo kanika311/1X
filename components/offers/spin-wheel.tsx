@@ -128,7 +128,7 @@ export function SpinWheel() {
                 <FiX />
               </button>
               <p className="text-[10px] uppercase tracking-wider text-rose-100/90">Spin & Win</p>
-              <h3 className="font-serif text-xl">
+              <h3 className=" text-xl">
                 {won.percent === 0 ? "No discount this spin" : `You won ${won.percent}% off!`}
               </h3>
             </div>
@@ -185,7 +185,7 @@ export function SpinWheel() {
           disabled={spinning}
           onClick={spin}
           className={cn(
-            "absolute z-10 flex size-16 items-center justify-center rounded-full border-4 border-white bg-mauve font-serif text-sm text-white shadow-glow transition",
+            "absolute z-10 flex size-16 items-center justify-center rounded-full border-4 border-white bg-mauve text-sm text-white shadow-glow transition",
             "hover:bg-mauve-deep disabled:opacity-70",
           )}
           aria-label="Spin the wheel"

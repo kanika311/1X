@@ -25,7 +25,7 @@ export function ProfileDetails() {
         <div className="flex size-20 items-center justify-center rounded-full bg-lavender-100 text-ink">
           <FiUser className="text-3xl" />
         </div>
-        <h1 className="mt-5 font-serif text-2xl text-ink">{displayName}</h1>
+        <h1 className="mt-5  text-2xl text-ink">{displayName}</h1>
         <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-muted">{accountLabel}</p>
       </div>
 
