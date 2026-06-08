@@ -32,10 +32,7 @@ export default async function TermsPage() {
           heading: "Intellectual property",
           body: "All branding, course materials, and site content belong to 1X · Dr. Ayxh unless otherwise stated. Reproduction without permission is not allowed.",
         },
-        {
-          heading: "Limitation of liability",
-          body: "We provide education and wellness services with professional care but cannot guarantee specific career or health outcomes. Use clinical advice as appropriate for your situation.",
-        },
+       
       ]}
     />
   );

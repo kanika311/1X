@@ -16,7 +16,7 @@ export function ChatHeader({ className = "", onClose, showEmail = false }: Props
       className={`flex items-center gap-3 rounded-t-3xl bg-[#f3c6d0] px-4 py-3.5 ${className}`}
     >
       <div className="relative size-11 shrink-0 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
-        <Image src='/logo.jpeg' alt={CHAT_NAME} fill className="object-cover" sizes="44px" />
+        <Image src='/LOGO.jpeg' alt={CHAT_NAME} fill className="object-cover" sizes="44px" />
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/70">{CHAT_HEADER}</p>

@@ -32,7 +32,7 @@ export function CartContent() {
         </div>
         <h2 className="mt-6  text-2xl text-ink">Your bag is empty</h2>
         <p className="mt-3 text-base leading-relaxed text-muted">
-          Add programs from the services page ΓÇö only what you add to cart will appear here.
+          Add programs from the services page only what you add to cart will appear here.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/services">

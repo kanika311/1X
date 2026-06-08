@@ -25,7 +25,7 @@ const SLIDES = [
     image: IMG.heroWellness,
     eyebrow: "Physiotherapy",
     title: "Recovery, Reimagined",
-    subtitle: "Dr. Ayesha’s signature therapy programs for body and mind.",
+    subtitle: "Dr. Ayxh’s signature therapy programs for body and mind.",
   },
 ] as const;
 

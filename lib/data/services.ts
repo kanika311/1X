@@ -24,7 +24,7 @@ export const services: TherapyService[] = [
     reviews: 512,
     price: 2499,
     image: IMG.service,
-    therapist: "Dr. Ayesha",
+    therapist: "Dr. Ayxh",
     bestseller: true,
     description:
       "Performance-focused recovery for athletes — mobility, strength, and injury prevention.",
@@ -39,7 +39,7 @@ export const services: TherapyService[] = [
     reviews: 689,
     price: 1999,
     image: IMG.serviceAlt,
-    therapist: "Dr. Ayesha",
+    therapist: "Dr. Ayxh",
     bestseller: true,
     description:
       "Evidence-based protocols for chronic and acute pain — back, neck, and joint focus.",
@@ -54,7 +54,7 @@ export const services: TherapyService[] = [
     reviews: 401,
     price: 2799,
     image: IMG.service,
-    therapist: "Dr. Ayesha",
+    therapist: "Dr. Ayxh",
     description:
       "Post-surgery and injury rehab with progressive loading and functional milestones.",
     highlights: ["Personalized phases", "Strength rebuilding", "Progress tracking"],
@@ -68,7 +68,7 @@ export const services: TherapyService[] = [
     reviews: 234,
     price: 3499,
     image: IMG.serviceAlt,
-    therapist: "Dr. Ayesha",
+    therapist: "Dr. Ayxh",
     description:
       "Premium at-home physiotherapy for busy professionals and limited-mobility clients.",
     highlights: ["Delhi NCR coverage", "Full equipment kit", "Family caregiver tips"],
@@ -82,7 +82,7 @@ export const services: TherapyService[] = [
     reviews: 367,
     price: 2199,
     image: IMG.service,
-    therapist: "Dr. Ayesha",
+    therapist: "Dr. Ayxh",
     bestseller: true,
     description:
       "Desk-worker programs for spinal alignment, ergonomics, and long-term habit change.",

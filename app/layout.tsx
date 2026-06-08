@@ -19,12 +19,12 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: {
-    default: "1X · Dr. Ayesha | Cybersecurity & Physiotherapy",
-    template: "%s | 1X · Dr. Ayesha",
+    default: "1X · Dr. Ayxh Cybersecurity & Physiotherapy",
+    template: "%s | 1X · Dr. Ayxh",
   },
   description:
-    "Premium cybersecurity courses and luxury physiotherapy by Dr. Ayesha — secure your future, heal your life.",
-  keywords: ["cybersecurity courses", "physiotherapy", "Dr. Ayesha", "ethical hacking", "SOC analyst"],
+    "Premium cybersecurity courses and luxury physiotherapy by Dr. Ayxh — secure your future, heal your life.",
+  keywords: ["cybersecurity courses", "physiotherapy", "Dr. Ayxh", "ethical hacking", "SOC analyst"],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

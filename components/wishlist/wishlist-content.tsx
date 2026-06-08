@@ -21,7 +21,7 @@ export function WishlistContent() {
         </div>
         <h2 className="mt-6  text-2xl text-ink">Your wishlist is empty</h2>
         <p className="mt-3 text-base leading-relaxed text-muted">
-          Tap the heart on any program to save it here ΓÇö only your favourites will appear.
+          Tap the heart on any program to save it here only your favourites will appear.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/services">

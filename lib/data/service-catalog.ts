@@ -166,7 +166,7 @@ const cyberServices: Omit<ServiceOffering, "domain" | "category">[] = [
   {
     slug: "security-operations",
     title: "Security Operations",
-    description: "Fully managed security operations ΓÇö detection, response, and continuous improvement.",
+    description: "Fully managed security operations detection, response, and continuous improvement.",
     duration: "Monthly",
     price: 89999,
     rating: 4.9,
@@ -240,7 +240,7 @@ const physioTherapy: Omit<ServiceOffering, "domain" | "category">[] = [
     image: IMG.authPhysio,
     iconKey: "trending-up",
     benefits: ["Phased recovery", "Surgeon-aligned protocols", "Safe progression", "Home exercise plans"],
-    faq: [{ q: "After ACL or knee replacement?", a: "Yes ΓÇö milestone-based rehab from week one post-op." }],
+    faq: [{ q: "After ACL or knee replacement?", a: "Yes milestone-based rehab from week one post-op." }],
     cta: "Book now",
   },
   {
@@ -332,7 +332,7 @@ const physioTherapy: Omit<ServiceOffering, "domain" | "category">[] = [
     image: IMG.serviceAlt,
     iconKey: "home",
     benefits: ["Delhi NCR visits", "Full equipment kit", "Mobility-friendly", "Flexible scheduling"],
-    faq: [{ q: "Coverage?", a: "Delhi NCR ΓÇö contact us for availability in your area." }],
+    faq: [{ q: "Coverage?", a: "Delhi NCR  contact us for availability in your area." }],
     cta: "Book visit",
   },
   {
@@ -347,7 +347,7 @@ const physioTherapy: Omit<ServiceOffering, "domain" | "category">[] = [
     image: IMG.heroWellness,
     iconKey: "monitor",
     benefits: ["Video consults", "Posture checks", "Home exercise plans", "Follow-up support"],
-    faq: [{ q: "How does it work?", a: "Book a slot ΓÇö you'll receive a secure video link before your session." }],
+    faq: [{ q: "How does it work?", a: "Book a slot  you'll receive a secure video link before your session." }],
     cta: "Book online",
   },
 ];
@@ -373,7 +373,7 @@ export const categoryMeta: CategoryMeta[] = [
     title: "Cybersecurity Courses",
     subtitle: "Industry-aligned programs with live labs and certificates",
     overview:
-      "From ethical hacking to SOC operations ΓÇö immersive courses designed for career transformation in cybersecurity.",
+      "From ethical hacking to SOC operations immersive courses designed for career transformation in cybersecurity.",
     benefits: ["Hands-on labs", "Certificate on completion", "Career support", "Expert mentors"],
     image: IMG.course,
     faq: [
@@ -387,7 +387,7 @@ export const categoryMeta: CategoryMeta[] = [
     title: "Cybersecurity Services",
     subtitle: "Managed detection, response, and operations",
     overview:
-      "Always-on security services ΓÇö monitoring, incident response, threat intelligence, and full security operations.",
+      "Always-on security services monitoring, incident response, threat intelligence, and full security operations.",
     benefits: ["24/7 coverage options", "Retainer flexibility", "Integrated tooling", "Dedicated teams"],
     image: IMG.heroCyber,
     faq: [
@@ -401,7 +401,7 @@ export const categoryMeta: CategoryMeta[] = [
     title: "Physiotherapy Services",
     subtitle: "Expert hands-on care by Dr. Ayesha",
     overview:
-      "Comprehensive physiotherapy across orthopedics, neurology, sports, post-surgical rehab, pain management, women's health, geriatric care, and more ΓÇö in clinic, at home, or online.",
+      "Comprehensive physiotherapy across orthopedics, neurology, sports, post-surgical rehab, pain management, women's health, geriatric care, and more  in clinic, at home, or online.",
     benefits: [
       "Manual therapy & dry needling",
       "Personalized rehab plans",

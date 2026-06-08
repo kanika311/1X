@@ -18,7 +18,7 @@ export default async function PrivacyPage() {
       fallbackSections={[
         {
           heading: "Information we collect",
-          body: "We may collect your name, email, phone, order details, and messages you send via contact forms or our Ami chat assistant.",
+          body: "We may collect your name, email, phone, order details, and messages you send via contact forms or our 1X Assistant chat assistant.",
         },
         {
           heading: "How we use it",

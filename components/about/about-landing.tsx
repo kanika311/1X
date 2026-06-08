@@ -12,7 +12,7 @@ export function AboutLanding() {
         {/* <p className="font-serif text-2xl leading-relaxed text-ink md:text-3xl">
           Where clinical excellence meets digital defense — one vision for whole-person wellness.
         </p> */}
-          <p className="mt-10 text-cente  text-2xl leading-relaxed text-ink">
+          <p className="mt-10 text-cente  text-2xl leading-relaxed text-ink font-serif italic">
           Dr. Ayxh founded 1X to unite two worlds: luxury physiotherapy that restores movement and confidence, and
           rigorous cybersecurity that opens doors in a high-demand industry. Every service we provide reflects the same
           standard — premium, personal, and outcome-driven.
@@ -25,18 +25,11 @@ export function AboutLanding() {
       
       </section>
 
-      <section className="bg-gradient-to-b from-rose-50/50 to-cream py-20">
-        <div className="mx-auto w-[40%] px-4 sm:px-6">
-          {/* <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-8 shadow-soft">
-            <h2 className="text-2xl text-ink">Mission</h2>
-            <p className="mt-4 text-base leading-relaxed text-muted">
-              Empower individuals to heal physically and grow professionally — through evidence-based therapy and
-              industry-aligned cyber training.
-            </p>
-          </div> */}
-          <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-8 shadow-soft">
-            <h2 className=" text-2xl text-ink">Vision</h2>
-            <p className="mt-4 text-base leading-relaxed text-muted">
+      <section className="bg-gradient-to-b from-rose-50/50 to-cream py-12 sm:py-20">
+        <div className="mx-auto w-full max-w-xl px-4 sm:max-w-2xl sm:px-6 lg:max-w-3xl">
+          <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-6 shadow-soft sm:p-8">
+            <h2 className="text-xl text-ink sm:text-2xl">Vision</h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
               A world where wellness and digital literacy are equally accessible, delivered with the care of a luxury
               brand and the rigor of experts.
             </p>

@@ -24,5 +24,5 @@ export const IMG = {
   /** Meditation hero */
   about: u("1506126613408-eca07ce68773", 1400, 900),
   testimonial: u("1573497015587-b0659b7b0e0b", 600, 600),
-  drAyesha: u("1573497015587-b0659b7b0e0b", 800, 1000),
+  drAyxh: u("1573497015587-b0659b7b0e0b", 800, 1000),
 } as const;
