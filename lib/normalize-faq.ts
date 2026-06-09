@@ -24,7 +24,7 @@ function parseFaqItem(item: unknown): FaqItem | null {
 
   if (typeof item === "string") {
     const trimmed = item.trim();
-    const jsonMatch = trimmed.match(/^\{.*\}$/s);
+    const jsonMatch = trimmed.match(/^\{[\s\S]*\}$/);
     if (jsonMatch) {
       try {
         return parseFaqItem(JSON.parse(trimmed));
