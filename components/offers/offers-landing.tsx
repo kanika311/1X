@@ -215,7 +215,7 @@ function SpinAndWin() {
         <SectionHeading
           eyebrow="Interactive"
           title="Spin & Win Rewards"
-          description="Spin for a surprise discount on services — wins are usually between 0% and 5% off."
+          description="Spin the wheel from 0% to 100% — every prize is between 0% and 5% off your order."
         />
         <SpinWheel />
       </div>

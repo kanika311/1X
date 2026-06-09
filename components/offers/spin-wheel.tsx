@@ -10,23 +10,23 @@ import { Button } from "@/components/ui/button";
 import {
   buildSpinCouponCode,
   loadLastSpin,
+  pickDisplaySegmentIndex,
   pickSpinDiscount,
   saveLastSpin,
-  segmentIndexForPercent,
-  SPIN_SEGMENT_COUNT,
-  SPIN_SEGMENT_PERCENTS,
+  SPIN_DISPLAY_PERCENTS,
+  SPIN_DISPLAY_SEGMENT_COUNT,
   type StoredSpin,
 } from "@/lib/spin-rewards";
 import { cn } from "@/lib/utils";
 
-const DEG_PER_SEGMENT = 360 / SPIN_SEGMENT_COUNT;
+const DEG_PER_SEGMENT = 360 / SPIN_DISPLAY_SEGMENT_COUNT;
 const WHEEL_COLORS = ["#f3dce4", "#fceee8", "#e8c4d0", "#fdf5f7", "#efd4de", "#f5d6e0"];
 
 function WheelLabels() {
   return (
     <svg viewBox="0 0 200 200" className="pointer-events-none absolute inset-0 size-full">
-      {SPIN_SEGMENT_PERCENTS.map((pct, i) => {
-        const angle = ((i + 0.5) / SPIN_SEGMENT_COUNT) * 360 - 90;
+      {SPIN_DISPLAY_PERCENTS.map((pct, i) => {
+        const angle = ((i + 0.5) / SPIN_DISPLAY_SEGMENT_COUNT) * 360 - 90;
         const rad = (angle * Math.PI) / 180;
         const x = 100 + 62 * Math.cos(rad);
         const y = 100 + 62 * Math.sin(rad);
@@ -37,7 +37,7 @@ function WheelLabels() {
             y={y}
             textAnchor="middle"
             dominantBaseline="middle"
-            className="fill-mauve-deep text-[13px] font-bold"
+            className="fill-mauve-deep text-[11px] font-bold sm:text-[12px]"
             style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
           >
             {pct}%
@@ -56,10 +56,10 @@ export function SpinWheel() {
   const [won, setWon] = useState<StoredSpin | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const conicStops = SPIN_SEGMENT_PERCENTS.map((_, i) => {
-    const start = (i / SPIN_SEGMENT_COUNT) * 100;
-    const end = ((i + 1) / SPIN_SEGMENT_COUNT) * 100;
-    return `${WHEEL_COLORS[i]} ${start}% ${end}%`;
+  const conicStops = SPIN_DISPLAY_PERCENTS.map((_, i) => {
+    const start = (i / SPIN_DISPLAY_SEGMENT_COUNT) * 100;
+    const end = ((i + 1) / SPIN_DISPLAY_SEGMENT_COUNT) * 100;
+    return `${WHEEL_COLORS[i % WHEEL_COLORS.length]} ${start}% ${end}%`;
   }).join(", ");
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export function SpinWheel() {
     if (spinning) return;
 
     const percent = pickSpinDiscount();
-    const index = segmentIndexForPercent(percent);
+    const index = pickDisplaySegmentIndex();
     const segmentCenter = index * DEG_PER_SEGMENT + DEG_PER_SEGMENT / 2;
     const extraTurns = 5 + Math.floor(Math.random() * 3);
     const target = rotation + extraTurns * 360 + (360 - segmentCenter);

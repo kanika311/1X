@@ -8,10 +8,16 @@ export const SPIN_WEIGHTS: { percent: number; weight: number }[] = [
   { percent: 5, weight: 5 },
 ];
 
-/** One slice per percent — wheel shows 0% through 5% clearly */
-export const SPIN_SEGMENT_PERCENTS = [0, 1, 2, 3, 4, 5] as const;
+/** Wheel labels — visual range 0% through 100% */
+export const SPIN_DISPLAY_PERCENTS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] as const;
 
-export const SPIN_SEGMENT_COUNT = SPIN_SEGMENT_PERCENTS.length;
+export const SPIN_DISPLAY_SEGMENT_COUNT = SPIN_DISPLAY_PERCENTS.length;
+
+/** @deprecated use SPIN_DISPLAY_PERCENTS */
+export const SPIN_SEGMENT_PERCENTS = SPIN_DISPLAY_PERCENTS;
+
+/** @deprecated use SPIN_DISPLAY_SEGMENT_COUNT */
+export const SPIN_SEGMENT_COUNT = SPIN_DISPLAY_SEGMENT_COUNT;
 
 export function pickSpinDiscount(): number {
   const total = SPIN_WEIGHTS.reduce((s, w) => s + w.weight, 0);
@@ -23,9 +29,9 @@ export function pickSpinDiscount(): number {
   return 0;
 }
 
-export function segmentIndexForPercent(percent: number): number {
-  const idx = SPIN_SEGMENT_PERCENTS.indexOf(percent as (typeof SPIN_SEGMENT_PERCENTS)[number]);
-  return idx >= 0 ? idx : 0;
+/** Random slice for wheel animation (0–100% display only). */
+export function pickDisplaySegmentIndex(): number {
+  return Math.floor(Math.random() * SPIN_DISPLAY_SEGMENT_COUNT);
 }
 
 export function buildSpinCouponCode(percent: number): string {

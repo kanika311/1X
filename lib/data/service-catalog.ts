@@ -399,7 +399,7 @@ export const categoryMeta: CategoryMeta[] = [
     domain: "physio",
     category: "therapy",
     title: "Physiotherapy Services",
-    subtitle: "Expert hands-on care by Dr. Ayesha",
+    subtitle: "Expert hands-on care by Dr. Ayxh",
     overview:
       "Comprehensive physiotherapy across orthopedics, neurology, sports, post-surgical rehab, pain management, women's health, geriatric care, and more  in clinic, at home, or online.",
     benefits: [
