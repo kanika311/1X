@@ -7,6 +7,7 @@ import {
 } from "@/lib/data/service-catalog";
 import type { ServiceIconKey } from "@/lib/service-icons";
 import { resolveApiMediaUrl } from "@/lib/media-url";
+import { normalizeFaqList } from "@/lib/normalize-faq";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -46,7 +47,7 @@ export function productToOffering(p: ApiProduct): ServiceOffering {
     iconKey: (p.iconKey || "shield") as ServiceIconKey,
     bestseller: Boolean(p.bestseller),
     benefits: Array.isArray(p.benefits) ? p.benefits : [],
-    faq: Array.isArray(p.faq) ? p.faq : [],
+    faq: normalizeFaqList(p.faq),
     cta: p.cta || (p.category === "courses" ? "Enroll now" : "Book now"),
   };
 }

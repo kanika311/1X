@@ -8,6 +8,7 @@ import { ServiceOfferingCard } from "@/components/services/service-offering-card
 import { Button } from "@/components/ui/button";
 import { SoftImage } from "@/components/ui/soft-image";
 import { Testimonials } from "@/components/home/testimonials";
+import { HealthcareFaqSection } from "@/components/services/healthcare-faq-section";
 import type { CategoryMeta, ServiceOffering } from "@/lib/data/service-catalog";
 import { categoryPath, offeringPath } from "@/lib/data/service-catalog";
 
@@ -66,17 +67,15 @@ export function CategoryDetailLayout({ meta, offerings }: CategoryDetailLayoutPr
 
       <Testimonials />
 
-      <section className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <h2 className="text-center  text-2xl text-ink">FAQ</h2>
-        <dl className="mt-10 space-y-8">
-          {meta.faq.map(({ q, a }) => (
-            <div key={q} className="border-b border-rose-100 pb-6">
-              <dt className="font-medium text-ink">{q}</dt>
-              <dd className="mt-2 text-base text-muted">{a}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      {meta.domain === "physio" ? (
+        <HealthcareFaqSection
+          serviceTitle={meta.title}
+          domain={meta.domain}
+          extraFaqs={meta.faq}
+          bookHref="/contact"
+          bookLabel="Book appointment"
+        />
+      ) : null}
 
       <section className="mx-auto max-w-3xl px-4 pb-20 text-center sm:px-6">
         <div className="rounded-3xl border border-rose-100 bg-gradient-to-br from-rose-50 via-white to-peach-100 p-10 shadow-glow">
