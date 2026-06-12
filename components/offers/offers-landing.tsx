@@ -170,7 +170,7 @@ function DailyWellness() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <SectionHeading eyebrow="Daily wellness" title="365 Days of Wellness" />
+      <SectionHeading  title="365 Days of Wellness" />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, i) => (
           <OfferCard key={card.title} title={card.title} description={card.desc} className="text-center">
@@ -194,7 +194,7 @@ function CommitmentReward() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <SectionHeading
-        eyebrow="Loyalty"
+
         title="Commitment Reward Program"
         description="Members who consistently attend sessions throughout the year become eligible for special annual reward programs."
       />
@@ -213,9 +213,9 @@ function SpinAndWin() {
     <section className="bg-gradient-to-b from-rose-50/60 to-background py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
-          eyebrow="Interactive"
+         
           title="Spin & Win Rewards"
-          description="Spin the wheel from 0% to 100% — every prize is between 0% and 5% off your order."
+          description="Spin the wheel to win discounts on your next purchase."
         />
         <SpinWheel />
       </div>
@@ -233,7 +233,7 @@ function SpecialDiscounts() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <SectionHeading eyebrow="Savings" title="Special Discounts" />
+      <SectionHeading title="Special Discounts" />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {offers.map((o) => (
           <OfferCard key={o.title} title={o.title} description={o.desc}>
@@ -311,7 +311,7 @@ function MemberExtras() {
   return (
     <section className="bg-gradient-to-b from-cream to-rose-50/40 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <SectionHeading eyebrow="Extras" title="Member Exclusive Extras" />
+        <SectionHeading  title="Member Exclusive Extras" />
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {extras.map((item) => (
             <div

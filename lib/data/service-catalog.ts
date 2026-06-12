@@ -428,8 +428,8 @@ export const CATEGORY_LABELS: Record<ServiceCategory, string> = {
 };
 
 export const CYBER_SECTIONS: { key: CyberCategory; label: string }[] = [
-  { key: "courses", label: "Courses" },
   { key: "services", label: "Services" },
+  { key: "courses", label: "Courses" },
 ];
 
 export const PHYSIO_SECTIONS: { key: PhysioCategory; label: string }[] = [

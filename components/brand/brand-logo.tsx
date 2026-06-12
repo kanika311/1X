@@ -1,6 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
+
+/** Home / About landing — same as main nav "About" link */
+export const BRAND_HOME_HREF = "/";
 
 type BrandLogoProps = {
   className?: string;
@@ -38,5 +42,23 @@ export function BrandTagline({ className, size = "md" }: BrandLogoProps) {
     <span className={cn("mt-0.5 block font-semibold  text-muted", s.tag, className)}>
       Dr. Ayxh
     </span>
+  );
+}
+
+type BrandHomeLinkProps = BrandLogoProps & {
+  onNavigate?: () => void;
+};
+
+export function BrandHomeLink({ className, size = "md", onNavigate }: BrandHomeLinkProps) {
+  return (
+    <Link
+      href={BRAND_HOME_HREF}
+      onClick={onNavigate}
+      className={cn("relative top-[5px] inline-block shrink-0 text-center", className)}
+      aria-label="1X About — go to homepage"
+    >
+      <BrandLogo size={size} className="block" />
+      <BrandTagline size={size} />
+    </Link>
   );
 }

@@ -1,19 +1,31 @@
-﻿"use client";
+"use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { subscribeNewsletter } from "@/lib/newsletter-api";
 
 export function FooterNewsletter() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
-    setDone(true);
-    setEmail("");
+    setError("");
+    setSubmitting(true);
+    try {
+      await subscribeNewsletter(email);
+      setDone(true);
+      setEmail("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not sign up.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -22,7 +34,7 @@ export function FooterNewsletter() {
       {done ? (
         <p className="mt-4 text-sm lowercase text-muted">thank you you&apos;re on the list.</p>
       ) : (
-        <form onSubmit={submit} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-stretch">
+        <form onSubmit={(e) => void submit(e)} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-stretch">
           <input
             type="email"
             value={email}
@@ -34,16 +46,22 @@ export function FooterNewsletter() {
           <Button
             type="submit"
             variant="outline"
+            disabled={submitting}
             className="min-h-11 rounded-none border-mauve/25 px-8 !normal-case !tracking-normal sm:shrink-0"
           >
-            submit
+            {submitting ? "…" : "submit"}
           </Button>
         </form>
       )}
+      {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
       <p className="mt-3 text-xs lowercase text-subtle">
         by signing up you agree to our{" "}
-        <Link href="/contact" className="underline underline-offset-2 hover:text-mauve">
-          terms
+        <Link href="/terms" className="underline underline-offset-2 transition-colors hover:text-mauve">
+          terms and conditions
+        </Link>{" "}
+        and{" "}
+        <Link href="/privacy" className="underline underline-offset-2 transition-colors hover:text-mauve">
+          privacy policy
         </Link>
         .
       </p>

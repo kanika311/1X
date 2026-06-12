@@ -4,11 +4,16 @@ export const UPI_PAYEE_NAME =
 export const UPI_ID =
   process.env.NEXT_PUBLIC_UPI_ID || "ayeshaaahmedsinghrockzzz@okhdfcbank";
 
+type UpiConfig = {
+  upiId?: string;
+  payeeName?: string;
+};
+
 /** UPI deep link — amount pre-filled for PhonePe / GPay / Paytm scan */
-export function buildUpiPayUrl(amount: number, note: string) {
+export function buildUpiPayUrl(amount: number, note: string, config?: UpiConfig) {
   const params = new URLSearchParams({
-    pa: UPI_ID,
-    pn: UPI_PAYEE_NAME,
+    pa: config?.upiId?.trim() || UPI_ID,
+    pn: config?.payeeName?.trim() || UPI_PAYEE_NAME,
     am: String(Number(amount).toFixed(2)),
     cu: "INR",
     tn: note.slice(0, 80),

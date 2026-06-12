@@ -9,7 +9,6 @@ import { useShop } from "@/components/providers/shop-provider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SoftImage } from "@/components/ui/soft-image";
-import { Testimonials } from "@/components/home/testimonials";
 import { HealthcareFaqSection } from "@/components/services/healthcare-faq-section";
 import type { ServiceOffering } from "@/lib/data/service-catalog";
 import {
@@ -82,8 +81,6 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
           </ul>
         </div>
       </section>
-
-      <Testimonials />
 
       <HealthcareFaqSection
         serviceTitle={offering.title}

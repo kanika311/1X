@@ -6,8 +6,6 @@ import { FiCheck, FiStar } from "react-icons/fi";
 
 import { ServiceOfferingCard } from "@/components/services/service-offering-card";
 import { Button } from "@/components/ui/button";
-import { SoftImage } from "@/components/ui/soft-image";
-import { Testimonials } from "@/components/home/testimonials";
 import { HealthcareFaqSection } from "@/components/services/healthcare-faq-section";
 import type { CategoryMeta, ServiceOffering } from "@/lib/data/service-catalog";
 import { categoryPath, offeringPath } from "@/lib/data/service-catalog";
@@ -20,9 +18,8 @@ type CategoryDetailLayoutProps = {
 export function CategoryDetailLayout({ meta, offerings }: CategoryDetailLayoutProps) {
   return (
     <article>
-      <section className="relative min-h-[45vh] overflow-hidden">
-        <SoftImage src={meta.image} alt={meta.title} overlay="hero" rounded="none" priority sizes="100vw" className="min-h-[45vh]" />
-        <div className="relative mx-auto max-w-4xl px-4 pb-16 pt-28 text-center sm:px-6">
+      <section className="border-b border-rose-100/60 bg-gradient-to-b from-rose-50/50 to-background">
+        <div className="mx-auto max-w-4xl px-4 pb-14 pt-28 text-center sm:px-6">
           <p className="eyebrow">{meta.subtitle}</p>
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
@@ -64,8 +61,6 @@ export function CategoryDetailLayout({ meta, offerings }: CategoryDetailLayoutPr
           ))}
         </div>
       </section>
-
-      <Testimonials />
 
       {meta.domain === "physio" ? (
         <HealthcareFaqSection

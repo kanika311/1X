@@ -121,7 +121,7 @@ export function Testimonials({ showHeading = false }: Props) {
       ) : null}
       {!showHeading ? (
         <Link
-          href="/testimonials"
+          href="/testimonials#share"
           className="mt-10 inline-block text-xs font-semibold uppercase tracking-wide text-mauve-deep hover:underline"
         >
           Share your experience

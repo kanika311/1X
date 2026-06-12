@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiHeart, FiMenu, FiSearch, FiShoppingBag, FiUser } from "react-icons/fi";
 
-import { BrandLogo, BrandTagline } from "@/components/brand/brand-logo";
+import { BrandHomeLink } from "@/components/brand/brand-logo";
 import { useShopBadgeCounts } from "@/lib/shop-counts";
 import { SearchModal } from "@/components/layout/search-modal";
 import { MobileDrawer } from "@/components/layout/mobile-drawer";
@@ -40,10 +40,7 @@ export function Navbar({ scrolled = false }: { scrolled?: boolean }) {
             >
               <FiMenu />
             </button>
-            <Link href="/" className="relative top-[5px] shrink-0 text-center">
-              <BrandLogo size="md" className="block" />
-              <BrandTagline size="md" />
-            </Link>
+            <BrandHomeLink size="md" />
           </div>
 
           {/* Center — nav links */}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
 
-import { BrandLogo, BrandTagline } from "@/components/brand/brand-logo";
+import { BrandHomeLink } from "@/components/brand/brand-logo";
 import { useAuth } from "@/components/providers/auth-provider";
 import { FOOTER_LEGAL, MOBILE_NAV } from "@/lib/nav";
 
@@ -22,10 +22,7 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
           className="fixed inset-y-0 left-0 z-[65] flex w-[min(88vw,320px)] flex-col bg-white shadow-glow"
         >
           <div className="flex items-center justify-between border-b border-ink/8 px-6 py-5">
-            <div>
-              <BrandLogo size="sm" />
-              <BrandTagline size="sm" />
-            </div>
+            <BrandHomeLink size="sm" onNavigate={onClose} />
             <button type="button" onClick={onClose} aria-label="Close menu">
               <FiX className="text-2xl" />
             </button>

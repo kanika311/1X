@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { AuthPanel } from "@/components/auth/auth-panel";
 import { ProfileDetails } from "@/components/profile/profile-details";
@@ -16,31 +16,48 @@ export default function ProfilePage() {
         <div className="absolute bottom-0 right-0 size-[380px] rounded-full bg-peach-100/90 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-16">
-        <div className="relative hidden aspect-[4/5] shadow-glow lg:block">
-          <SoftImage
-            src='/cyber.png'
-            alt="Luxury physiotherapy"
-            overlay="profile"
-            rounded="3xl"
-            sizes="50vw"
-          />
-          <p className="absolute bottom-8 left-8 right-8 z-10  text-2xl leading-snug text-white drop-shadow-sm">
-            Your account — courses, bookings, and care in one place.
-          </p>
-        </div>
-
-        <div className="flex justify-center lg:justify-end">
-          {!isReady ? (
-            <div className="flex h-64 items-center justify-center">
-              <div className="size-8 animate-pulse rounded-full bg-rose-200" />
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
+        {!isReady ? (
+          <div className="flex h-64 items-center justify-center">
+            <div className="size-8 animate-pulse rounded-full bg-rose-200" />
+          </div>
+        ) : session ? (
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
+            <div className="relative hidden aspect-[4/5] shadow-glow lg:block">
+              <SoftImage
+                src="/cyber.png"
+                alt="Luxury physiotherapy"
+                overlay="profile"
+                rounded="3xl"
+                sizes="40vw"
+              />
+              <p className="absolute bottom-8 left-8 right-8 z-10 text-2xl leading-snug text-white drop-shadow-sm">
+                Your account — courses, bookings, and orders in one place.
+              </p>
             </div>
-          ) : session ? (
-            <ProfileDetails />
-          ) : (
-            <AuthPanel />
-          )}
-        </div>
+            <div className="flex justify-center lg:justify-start">
+              <ProfileDetails />
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+            <div className="relative hidden aspect-[4/5] shadow-glow lg:block">
+              <SoftImage
+                src="/cyber.png"
+                alt="Luxury physiotherapy"
+                overlay="profile"
+                rounded="3xl"
+                sizes="50vw"
+              />
+              <p className="absolute bottom-8 left-8 right-8 z-10 text-2xl leading-snug text-white drop-shadow-sm">
+                Sign in to view your orders and manage your 1X account.
+              </p>
+            </div>
+            <div className="flex justify-center lg:justify-end">
+              <AuthPanel />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

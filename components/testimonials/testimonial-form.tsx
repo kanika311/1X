@@ -21,7 +21,11 @@ const FALLBACK_SERVICES = [
   "Other 1X Service",
 ];
 
-export function TestimonialForm() {
+type TestimonialFormProps = {
+  embedded?: boolean;
+};
+
+export function TestimonialForm({ embedded = false }: TestimonialFormProps) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [serviceUsed, setServiceUsed] = useState("");
@@ -94,7 +98,7 @@ export function TestimonialForm() {
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="relative mx-auto max-w-2xl">
+    <div className={embedded ? "relative w-full" : "relative mx-auto max-w-2xl"}>
       <AnimatePresence>
         {success ? (
           <motion.div
@@ -117,16 +121,22 @@ export function TestimonialForm() {
 
       <form
         onSubmit={(e) => void handleSubmit(e)}
-        className="glass rounded-2xl p-6 shadow-soft sm:p-8"
-        style={{ borderRadius: "16px" }}
+        className={embedded ? "space-y-5" : "glass rounded-2xl p-6 shadow-soft sm:p-8"}
+        style={embedded ? undefined : { borderRadius: "16px" }}
       >
-        <header className="mb-8 text-center">
-          <p className="eyebrow">Share your story</p>
-          <h2 className="mt-2 text-2xl text-ink sm:text-3xl">Submit a testimonial</h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted">
+        {!embedded ? (
+          <header className="mb-8 text-center">
+            <p className="eyebrow">Share your story</p>
+            <h2 className="mt-2 text-2xl text-ink sm:text-3xl">Share your experience</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              Real experiences help others trust 1X. Your review is moderated before it goes live.
+            </p>
+          </header>
+        ) : (
+          <p className="text-sm leading-relaxed text-muted">
             Real experiences help others trust 1X. Your review is moderated before it goes live.
           </p>
-        </header>
+        )}
 
         <div className="space-y-5">
           <div>

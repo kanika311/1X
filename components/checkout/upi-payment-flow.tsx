@@ -8,8 +8,15 @@ import { FiCheck, FiX } from "react-icons/fi";
 
 import { useAuth } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
+import { resolveApiMediaUrl } from "@/lib/media-url";
 import { placeOrder, submitOrderPayment, type OrderItemPayload } from "@/lib/orders-api";
-import { buildUpiPayUrl, UPI_ID, UPI_PAYEE_NAME } from "@/lib/upi";
+import {
+  DEFAULT_PAYMENT,
+  fetchSiteContent,
+  resolvePaymentFields,
+  type PaymentContent,
+} from "@/lib/site-content-api";
+import { buildUpiPayUrl } from "@/lib/upi";
 import { cn, formatPrice } from "@/lib/utils";
 
 const inputClass =
@@ -154,11 +161,20 @@ export function UpiPaymentFlow({
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentReference, setPaymentReference] = useState("");
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [payment, setPayment] = useState<PaymentContent>(DEFAULT_PAYMENT);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    fetchSiteContent()
+      .then((content) => setPayment(resolvePaymentFields(content)))
+      .catch(() => setPayment(DEFAULT_PAYMENT));
   }, []);
 
   useEffect(() => {
@@ -189,6 +205,8 @@ export function UpiPaymentFlow({
   function reset() {
     setStep(0);
     setOrderId(null);
+    setPaymentReference("");
+    setPaymentConfirmed(false);
     setError("");
     if (layout === "modal") setOpen(false);
   }
@@ -224,10 +242,18 @@ export function UpiPaymentFlow({
 
   async function handlePaymentDone() {
     if (!orderId) return;
+    if (!paymentConfirmed) {
+      setError("Please confirm you have paid via UPI before submitting.");
+      return;
+    }
+    if (paymentReference.trim().length < 4) {
+      setError("Enter your UPI transaction ID or reference number from your payment app.");
+      return;
+    }
     setError("");
     setSubmitting(true);
     try {
-      await submitOrderPayment(orderId);
+      await submitOrderPayment(orderId, paymentReference);
       setStep(2);
       const keys =
         purchasedCartKeys.length > 0
@@ -241,7 +267,11 @@ export function UpiPaymentFlow({
     }
   }
 
-  const upiUrl = buildUpiPayUrl(subtotal, orderLabel);
+  const upiUrl = buildUpiPayUrl(subtotal, orderLabel, {
+    upiId: payment.upiId,
+    payeeName: payment.upiPayeeName,
+  });
+  const qrImageUrl = payment.qrImage ? resolveApiMediaUrl(payment.qrImage) : "";
   const isModal = layout === "modal";
   const qrSize = isModal ? 128 : 180;
 
@@ -261,7 +291,8 @@ export function UpiPaymentFlow({
             Thank you, {name.split(" ")[0]}
           </h3>
           <p className={cn("leading-relaxed text-muted", isModal ? "mt-1 text-xs" : "mt-2 text-sm")}>
-            Payment received — we will verify UPI and confirm your membership shortly.
+            Your payment details were submitted. Our team will verify your UPI transfer and confirm your order
+            shortly.
           </p>
           {orderId ? (
             <p className="mt-2 inline-block rounded-full bg-rose-50 px-3 py-1 text-[10px] font-medium text-ink">
@@ -297,19 +328,53 @@ export function UpiPaymentFlow({
               </div>
               <div className="min-w-0">
                 <p className={cn("truncate font-semibold text-ink", isModal ? "text-xs" : "text-sm")}>
-                  {UPI_PAYEE_NAME}
+                  {payment.upiPayeeName}
                 </p>
-                <p className="truncate text-[10px] text-muted">{UPI_ID}</p>
+                <p className="truncate text-[10px] text-muted">{payment.upiId}</p>
               </div>
             </div>
             <div className={cn("flex justify-center rounded-lg bg-white", isModal ? "p-2" : "p-4")}>
-              <QRCodeSVG value={upiUrl} size={qrSize} level="M" includeMargin />
+              {qrImageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={qrImageUrl}
+                  alt="UPI payment QR code"
+                  width={qrSize}
+                  height={qrSize}
+                  className="rounded-md object-contain"
+                />
+              ) : (
+                <QRCodeSVG value={upiUrl} size={qrSize} level="M" includeMargin />
+              )}
             </div>
           </div>
 
           {!isModal ? (
             <p className="text-center text-xs text-muted">PhonePe · Google Pay · Paytm · any UPI app</p>
           ) : null}
+
+          <div className={cn("rounded-xl border border-rose-100 bg-rose-50/40", isModal ? "p-3" : "p-4")}>
+            <label className="text-xs font-medium text-ink">UPI transaction ID / reference</label>
+            <input
+              value={paymentReference}
+              onChange={(e) => setPaymentReference(e.target.value)}
+              placeholder="e.g. 123456789012"
+              className={inputClass}
+              autoComplete="off"
+            />
+            <label className="mt-3 flex cursor-pointer items-start gap-2.5">
+              <input
+                type="checkbox"
+                checked={paymentConfirmed}
+                onChange={(e) => setPaymentConfirmed(e.target.checked)}
+                className="mt-0.5 size-4 shrink-0 rounded border-rose-200"
+              />
+              <span className="text-xs leading-relaxed text-muted">
+                I confirm I have paid <strong className="text-ink">{formatPrice(subtotal)}</strong> via UPI using the
+                QR code above.
+              </span>
+            </label>
+          </div>
 
           {error ? (
             <p className="rounded-lg border border-red-100 bg-red-50 px-2 py-1.5 text-center text-xs text-red-600">
@@ -321,15 +386,23 @@ export function UpiPaymentFlow({
             type="button"
             className="w-full"
             size={isModal ? "default" : "lg"}
-            disabled={submitting}
+            disabled={submitting || !paymentConfirmed || paymentReference.trim().length < 4}
             onClick={() => void handlePaymentDone()}
           >
-            {submitting ? "Saving…" : "I have completed payment"}
+            {submitting ? "Submitting…" : "Submit payment for verification"}
           </Button>
+          <p className="text-center text-[10px] leading-relaxed text-subtle">
+            Only submit after paying in your UPI app. Orders stay pending until we verify your transfer.
+          </p>
           <button
             type="button"
             className="w-full text-center text-xs text-muted transition hover:text-mauve-deep"
-            onClick={() => setStep(0)}
+            onClick={() => {
+              setStep(0);
+              setPaymentReference("");
+              setPaymentConfirmed(false);
+              setError("");
+            }}
           >
             ← Edit details
           </button>

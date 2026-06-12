@@ -57,7 +57,10 @@ export function ServiceOfferingCard({ offering, index = 0 }: ServiceOfferingCard
               {offering.cta}
             </Button>
           </Link>
-          <Link href={categoryPath(offering.domain, offering.category)} className={`View all ${offering.category}`}>
+          <Link
+            href={categoryPath(offering.domain, offering.category)}
+            aria-label={`View all ${offering.category}`}
+          >
             <Button variant="outline" size="sm" className="px-3">
               <FiArrowRight />
             </Button>
@@ -79,10 +82,7 @@ export function CategorySection({ label, domain, category, items }: CategorySect
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow">{label}</p>
-          <h2 className="mt-1 text-2xl text-ink md:text-3xl">{label}</h2>
-        </div>
+        <h2 className="text-2xl text-ink md:text-3xl">{label}</h2>
         <Link
           href={categoryPath(domain, category)}
           className="text-xs font-semibold uppercase tracking-wide text-mauve transition-colors hover:text-mauve-deep"

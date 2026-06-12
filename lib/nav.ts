@@ -3,6 +3,7 @@ export const MAIN_NAV = [
   { href: "/", label: "About" },
   { href: "/services", label: "Services" },
   { href: "/gift-cards", label: "Gift Cards" },
+  { href: "/testimonials", label: "Testimonials" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
