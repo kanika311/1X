@@ -27,6 +27,7 @@ export type ServiceOffering = {
 export type CategoryMeta = {
   domain: ServiceDomain;
   category: ServiceCategory;
+  para: string;
   title: string;
   subtitle: string;
   overview: string;
@@ -371,6 +372,7 @@ export const categoryMeta: CategoryMeta[] = [
     domain: "cyber",
     category: "courses",
     title: "Cybersecurity Courses",
+    para:"we provide AI security to businesses and training  programs to eligibile interns",
     subtitle: "Industry-aligned programs with live labs and certificates",
     overview:
       "From ethical hacking to SOC operations immersive courses designed for career transformation in cybersecurity.",
@@ -385,6 +387,7 @@ export const categoryMeta: CategoryMeta[] = [
     domain: "cyber",
     category: "services",
     title: "Cybersecurity Services",
+    para:"we provide AI security to businesses and training  programs to eligibile interns",
     subtitle: "Managed detection, response, and operations",
     overview:
       "Always-on security services monitoring, incident response, threat intelligence, and full security operations.",
@@ -398,10 +401,11 @@ export const categoryMeta: CategoryMeta[] = [
   {
     domain: "physio",
     category: "therapy",
+    para:"",
     title: "Physiotherapy Services",
     subtitle: "Expert hands-on care by Dr. Ayxh",
     overview:
-      "Comprehensive physiotherapy across orthopedics, neurology, sports, post-surgical rehab, pain management, women's health, geriatric care, and more  in clinic, at home, or online.",
+      "Comprehensive physiotherapy across orthopedics, neurology, sports, post-surgical rehab, pain management, women's health, geriatric care, pedia care and more  in clinic, at home, or online.",
     benefits: [
       "Manual therapy & dry needling",
       "Personalized rehab plans",

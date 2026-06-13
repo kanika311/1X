@@ -12,10 +12,10 @@ type BrandLogoProps = {
 };
 
 const sizeClass = {
-  sm: { img: 32, tag: "text-[10px] tracking-[0.14em]" },
-  md: { img: 40, tag: "text-[11px] tracking-[0.14em]" },
-  lg: { img: 48, tag: "text-xs tracking-[0.14em]" },
-  xl: { img: 56, tag: "text-xs tracking-[0.14em]" },
+  sm: { img: 40, tag: "text-[10px] tracking-[0.14em]" },
+  md: { img: 52, tag: "text-[11px] tracking-[0.14em]" },
+  lg: { img: 58, tag: "text-xs tracking-[0.14em]" },
+  xl: { img: 64, tag: "text-xs tracking-[0.14em]" },
 } as const;
 
 export function BrandLogo({ className, size = "md" }: BrandLogoProps) {
@@ -54,11 +54,10 @@ export function BrandHomeLink({ className, size = "md", onNavigate }: BrandHomeL
     <Link
       href={BRAND_HOME_HREF}
       onClick={onNavigate}
-      className={cn("relative top-[5px] inline-block shrink-0 text-center", className)}
-      aria-label="1X About — go to homepage"
+      className={cn("inline-block shrink-0", className)}
+      aria-label="1X — go to homepage"
     >
-      <BrandLogo size={size} className="block" />
-      <BrandTagline size={size} />
+      <BrandLogo size={size} />
     </Link>
   );
 }

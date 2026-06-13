@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { SoftImage } from "@/components/ui/soft-image";
-import { IMG } from "@/lib/images";
 
 const OPTIONS = [
   {
@@ -13,7 +12,7 @@ const OPTIONS = [
     href: "/services/browse?domain=cyber",
     label: "Cybersecurity",
     subtitle: "Courses, labs & managed security services",
-    image: '/soc.jpeg',
+    image: "/cybersecurity.jpeg",
     alt: "Cybersecurity professional at work",
   },
   {
@@ -21,27 +20,36 @@ const OPTIONS = [
     href: "/services/browse?domain=physio",
     label: "Physiotherapy",
     subtitle: "Luxury hands-on care by Dr. Ayxh",
-    image: IMG.authPhysio,
+    image: "/physiotherapy.png",
     alt: "Physiotherapy and wellness session",
   },
 ] as const;
 
-export function ServicesChooser() {
+type ServicesChooserProps = {
+  /** Use on homepage — h2 heading, tighter spacing */
+  embedded?: boolean;
+};
+
+export function ServicesChooser({ embedded = false }: ServicesChooserProps) {
+  const HeadingTag = embedded ? "h2" : "h1";
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+    <div
+      className={
+        embedded
+          ? "mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8"
+          : "mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20"
+      }
+    >
       <motion.header
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         className="mb-12 text-center md:mb-16"
       >
-        {/* <p className="eyebrow">Services</p> */}
-        <h1 className="mt-3 text-3xl text-ink md:text-4xl lg:text-5xl">
+        <HeadingTag className="mt-3 text-3xl text-ink md:text-4xl lg:text-5xl">
           Which service do you want to explore?
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted md:text-base">
-          Choose cybersecurity programs or physiotherapy care — both delivered with the 1X premium standard.
-        </p>
+        </HeadingTag>
       </motion.header>
 
       <div className="grid gap-6 md:grid-cols-2 md:gap-8">
@@ -53,14 +61,14 @@ export function ServicesChooser() {
             transition={{ delay: index * 0.1, duration: 0.4 }}
             className="group overflow-hidden rounded-3xl border border-rose-100/80 bg-white shadow-soft"
           >
-            <div className="relative min-h-[280px] sm:min-h-[320px]">
+            <div className="relative h-[280px] sm:h-[320px]">
               <SoftImage
                 src={option.image}
                 alt={option.alt}
                 overlay="cta"
                 rounded="none"
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="transition-transform duration-500 group-hover:scale-[1.03]"
+                className="absolute inset-0 transition-transform duration-500 group-hover:scale-[1.03]"
               />
               <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-ink/70 via-ink/25 to-transparent p-8">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-100">1X by Dr. Ayxh</p>

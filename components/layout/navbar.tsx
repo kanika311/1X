@@ -30,7 +30,7 @@ export function Navbar({ scrolled = false }: { scrolled?: boolean }) {
         )}
       >
         <div className="relative mx-auto flex h-[72px] max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-          {/* Left — menu (mobile) + logo */}
+       
           <div className="flex min-w-0 flex-1 items-center justify-start gap-2 sm:gap-3">
             <button
               type="button"
@@ -40,7 +40,7 @@ export function Navbar({ scrolled = false }: { scrolled?: boolean }) {
             >
               <FiMenu />
             </button>
-            <BrandHomeLink size="md" />
+            <BrandHomeLink size="lg" />
           </div>
 
           {/* Center — nav links */}

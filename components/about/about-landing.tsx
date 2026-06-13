@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 
 import { AboutChatbotSection } from "@/components/about/about-chatbot-section";
 import { AboutHeroSlider } from "@/components/about/about-hero-slider";
+import { ServicesChooser } from "@/components/services/services-chooser";
 import {
   DEFAULT_ABOUT,
   fetchSiteContent,
+  resolveHeroSlides,
   type AboutContent,
+  type HeroSlide,
 } from "@/lib/site-content-api";
 
 function mergeAbout(raw?: Partial<AboutContent> | null): AboutContent {
@@ -21,23 +24,37 @@ function mergeAbout(raw?: Partial<AboutContent> | null): AboutContent {
 
 export function AboutLanding() {
   const [about, setAbout] = useState<AboutContent>(DEFAULT_ABOUT);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[] | undefined>(undefined);
 
   useEffect(() => {
     fetchSiteContent()
-      .then((content) => setAbout(mergeAbout(content?.about)))
-      .catch(() => setAbout(DEFAULT_ABOUT));
+      .then((content) => {
+        setAbout(mergeAbout(content?.about));
+        setHeroSlides(resolveHeroSlides(content));
+      })
+      .catch(() => {
+        setAbout(DEFAULT_ABOUT);
+        setHeroSlides(undefined);
+      });
   }, []);
 
   const storyLines = about.storyParagraph2.split("\n").filter(Boolean);
 
   return (
     <article>
-      <AboutHeroSlider />
+      <AboutHeroSlider initialSlides={heroSlides} />
 
       <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-        <p className="mt-10 text-center font-serif text-2xl italic leading-relaxed text-ink">
-          {about.storyParagraph1}
-        </p>
+      <p className="mt-10 font-serif text-2xl italic leading-relaxed text-ink">{about.storyParagraph1}</p>
+      <section className="bg-gradient-to-b from-rose-50/50 to-cream py-12 sm:py-20">
+        <div className="mx-auto w-full max-w-xl px-4 sm:max-w-2xl sm:px-6 lg:max-w-3xl">
+          <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-6 shadow-soft sm:p-8">
+            <h2 className="text-xl text-ink sm:text-2xl">{about.visionTitle}</h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">{about.visionText}</p>
+          </div>
+        </div>
+      </section>
+      
         <p className="mt-10 text-lg leading-relaxed text-muted">
           {storyLines.map((line, i) => (
             <span key={i}>
@@ -48,14 +65,9 @@ export function AboutLanding() {
         </p>
       </section>
 
-      <section className="bg-gradient-to-b from-rose-50/50 to-cream py-12 sm:py-20">
-        <div className="mx-auto w-full max-w-xl px-4 sm:max-w-2xl sm:px-6 lg:max-w-3xl">
-          <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-6 shadow-soft sm:p-8">
-            <h2 className="text-xl text-ink sm:text-2xl">{about.visionTitle}</h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">{about.visionText}</p>
-          </div>
-        </div>
-      </section>
+     
+
+      <ServicesChooser embedded />
 
       <AboutChatbotSection />
     </article>

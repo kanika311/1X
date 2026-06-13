@@ -1,15 +1,19 @@
-/** Weighted discount — always 0–5% */
+/** Weighted discount — actual prize always 1–5% */
 export const SPIN_WEIGHTS: { percent: number; weight: number }[] = [
-  { percent: 0, weight: 28 },
-  { percent: 1, weight: 26 },
-  { percent: 2, weight: 22 },
-  { percent: 3, weight: 14 },
-  { percent: 4, weight: 7 },
-  { percent: 5, weight: 5 },
+  { percent: 1, weight: 28 },
+  { percent: 2, weight: 26 },
+  { percent: 3, weight: 22 },
+  { percent: 4, weight: 14 },
+  { percent: 5, weight: 10 },
 ];
 
-/** Wheel labels — visual range 0% through 100% */
-export const SPIN_DISPLAY_PERCENTS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] as const;
+/** Wheel labels — visual range 1%–100% (prize still 1–5%) */
+export const SPIN_DISPLAY_PERCENTS = [
+  1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
+] as const;
+
+/** Segments the wheel can land on (must exist in SPIN_DISPLAY_PERCENTS) */
+export const SPIN_WIN_PERCENTS = [1, 2, 3, 4, 5] as const;
 
 export const SPIN_DISPLAY_SEGMENT_COUNT = SPIN_DISPLAY_PERCENTS.length;
 
@@ -26,16 +30,23 @@ export function pickSpinDiscount(): number {
     roll -= weight;
     if (roll <= 0) return percent;
   }
-  return 0;
+  return 1;
 }
 
-/** Random slice for wheel animation (0–100% display only). */
+/** Slice index on the wheel for the discount that was won (1–5% slots only). */
+export function displaySegmentIndexForPercent(percent: number): number {
+  const p = Math.min(5, Math.max(1, Math.round(percent)));
+  const idx = SPIN_DISPLAY_PERCENTS.indexOf(p as (typeof SPIN_DISPLAY_PERCENTS)[number]);
+  return idx >= 0 ? idx : 0;
+}
+
+/** @deprecated use displaySegmentIndexForPercent */
 export function pickDisplaySegmentIndex(): number {
-  return Math.floor(Math.random() * SPIN_DISPLAY_SEGMENT_COUNT);
+  return displaySegmentIndexForPercent(pickSpinDiscount());
 }
 
 export function buildSpinCouponCode(percent: number): string {
-  const p = Math.min(5, Math.max(0, Math.round(percent)));
+  const p = Math.min(5, Math.max(1, Math.round(percent)));
   const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `SPIN${p}-${suffix}`;
 }

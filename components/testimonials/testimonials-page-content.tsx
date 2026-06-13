@@ -36,10 +36,10 @@ export function TestimonialsPageContent() {
         transition={{ duration: 0.4 }}
         className="mb-10 text-center"
       >
-        <p className="eyebrow">Testimonials</p>
+      
         <h1 className="mt-3 text-3xl text-ink md:text-4xl">Client voices</h1>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-          Read what our clients say about 1X services and courses, or share your own experience.
+          Read what our clients say about 1X.
         </p>
       </motion.header>
 

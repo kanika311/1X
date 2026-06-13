@@ -22,7 +22,7 @@ export function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => 
           className="fixed inset-y-0 left-0 z-[65] flex w-[min(88vw,320px)] flex-col bg-white shadow-glow"
         >
           <div className="flex items-center justify-between border-b border-ink/8 px-6 py-5">
-            <BrandHomeLink size="sm" onNavigate={onClose} />
+            <BrandHomeLink size="md" onNavigate={onClose} />
             <button type="button" onClick={onClose} aria-label="Close menu">
               <FiX className="text-2xl" />
             </button>

@@ -1,3 +1,5 @@
+import { IMG } from "@/lib/images";
+
 export type LegalSection = { heading: string; body: string };
 export type LegalDoc = { title: string; intro: string; sections: LegalSection[] };
 export type ContactContent = {
@@ -17,6 +19,19 @@ export type AboutContent = {
   visionText: string;
 };
 
+export type FounderContent = {
+  eyebrow: string;
+  title: string;
+  body: string;
+  image: string;
+};
+
+export type HeroSlide = {
+  mediaType: "image" | "video";
+  src: string;
+  alt: string;
+};
+
 export type PaymentContent = {
   upiId: string;
   upiPayeeName: string;
@@ -26,11 +41,32 @@ export type PaymentContent = {
 export type SiteContent = {
   key: string;
   about: AboutContent;
+  founder?: FounderContent;
+  homeHeroSlides?: HeroSlide[];
   contact: ContactContent;
   payment?: PaymentContent;
   privacy: LegalDoc;
   terms: LegalDoc;
   updatedAt?: string;
+};
+
+export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
+  { mediaType: "image", src: "/cyber.png", alt: "Cybersecurity" },
+  { mediaType: "image", src: IMG.about, alt: "Wellness studio" },
+  { mediaType: "image", src: "/Logo.jpeg", alt: "1X" },
+];
+
+export const DEFAULT_FOUNDER: FounderContent = {
+  eyebrow: "About the founder",
+  title: "Dr. Ayxh, Founder of 1X",
+  body: `Raised across multiple cultures and faiths, she grew up seeing how safety, identity, and dignity intersect. That perspective shaped everything.
+
+With degrees in business, tech, medicine, and fashion, Ayxh brings a rare mix: the precision of a doctor + physiotherapist, the mindset of an ethical hacker, and the eye of a designer. She speaks multiple languages. She is a Polymath and Builder.
+
+She built 1X to reimagine security — not as guards and gates, but as luxury + care. High-trust protection meets therapy, wellness, and human-first service. Because safety should feel as good as it looks.
+
+She started 1X with one vision: security and therapy that feel luxurious, not intimidating. Services built on discretion, empathy, and cutting-edge tech — so clients feel protected, not policed.`,
+  image: "",
 };
 
 export const DEFAULT_ABOUT: AboutContent = {
@@ -58,6 +94,25 @@ export const DEFAULT_CONTACT: ContactContent = {
   whatsapp: "+91 6289672438",
   linkedin: "",
 };
+
+export function resolveHeroSlides(content: SiteContent | null): HeroSlide[] {
+  const slides = content?.homeHeroSlides?.filter((s) => s.src?.trim()) ?? [];
+  return slides.length > 0 ? slides : DEFAULT_HERO_SLIDES;
+}
+
+export function resolveFounderFields(content: SiteContent | null): FounderContent {
+  if (content === null) {
+    return DEFAULT_FOUNDER;
+  }
+
+  const f = content.founder ?? ({} as Partial<FounderContent>);
+  return {
+    eyebrow: f.eyebrow?.trim() || DEFAULT_FOUNDER.eyebrow,
+    title: f.title?.trim() || DEFAULT_FOUNDER.title,
+    body: f.body?.trim() || DEFAULT_FOUNDER.body,
+    image: f.image?.trim() ?? "",
+  };
+}
 
 export function resolvePaymentFields(content: SiteContent | null): PaymentContent {
   if (content === null) {

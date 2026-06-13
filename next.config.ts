@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
     return [
       { source: "/offers", destination: "/gift-cards", permanent: true },
       { source: "/gift_cards", destination: "/gift-cards", permanent: true },
-      { source: "/about", destination: "/", permanent: true },
     ];
   },
 

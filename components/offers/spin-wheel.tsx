@@ -9,8 +9,8 @@ import { FiCheck, FiCopy, FiX } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import {
   buildSpinCouponCode,
+  displaySegmentIndexForPercent,
   loadLastSpin,
-  pickDisplaySegmentIndex,
   pickSpinDiscount,
   saveLastSpin,
   SPIN_DISPLAY_PERCENTS,
@@ -37,7 +37,7 @@ function WheelLabels() {
             y={y}
             textAnchor="middle"
             dominantBaseline="middle"
-            className="fill-mauve-deep text-[11px] font-bold sm:text-[12px]"
+            className="fill-mauve-deep text-[8px] font-bold sm:text-[9px]"
             style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
           >
             {pct}%
@@ -71,7 +71,7 @@ export function SpinWheel() {
     if (spinning) return;
 
     const percent = pickSpinDiscount();
-    const index = pickDisplaySegmentIndex();
+    const index = displaySegmentIndexForPercent(percent);
     const segmentCenter = index * DEG_PER_SEGMENT + DEG_PER_SEGMENT / 2;
     const extraTurns = 5 + Math.floor(Math.random() * 3);
     const target = rotation + extraTurns * 360 + (360 - segmentCenter);
@@ -128,39 +128,29 @@ export function SpinWheel() {
                 <FiX />
               </button>
               <p className="text-[10px] uppercase tracking-wider text-rose-100/90">Spin & Win</p>
-              <h3 className=" text-xl">
-                {won.percent === 0 ? "No discount this spin" : `You won ${won.percent}% off!`}
-              </h3>
+              <h3 className=" text-xl">You won {won.percent}% off!</h3>
             </div>
             <div className="px-4 py-4 text-center">
-              <p className="text-sm text-muted">
-                {won.percent > 0
-                  ? "Use this code in your cart before checkout."
-                  : "Spin again — prizes are always between 0% and 5% off."}
-              </p>
+              <p className="text-sm text-muted">Use this code in your cart before checkout.</p>
               <p className="mt-3 rounded-xl bg-rose-50 px-4 py-3 font-mono text-lg font-semibold text-ink">{won.code}</p>
-              {won.percent > 0 ? (
-                <>
-                  <Button type="button" className="mt-4 w-full" onClick={() => void copyCode()}>
-                    {copied ? (
-                      <>
-                        <FiCheck /> Copied
-                      </>
-                    ) : (
-                      <>
-                        <FiCopy /> Copy code
-                      </>
-                    )}
-                  </Button>
-                  <Link href="/cart" className="mt-2 block" onClick={() => setResultOpen(false)}>
-                    <Button type="button" variant="outline" className="w-full">
-                      Go to cart & apply
-                    </Button>
-                  </Link>
-                </>
-              ) : null}
+              <Button type="button" className="mt-4 w-full" onClick={() => void copyCode()}>
+                {copied ? (
+                  <>
+                    <FiCheck /> Copied
+                  </>
+                ) : (
+                  <>
+                    <FiCopy /> Copy code
+                  </>
+                )}
+              </Button>
+              <Link href="/cart" className="mt-2 block" onClick={() => setResultOpen(false)}>
+                <Button type="button" variant="outline" className="w-full">
+                  Go to cart & apply
+                </Button>
+              </Link>
               <Button type="button" variant="outline" size="sm" className="mt-2 w-full" onClick={() => setResultOpen(false)}>
-                {won.percent === 0 ? "Spin again" : "Done"}
+                Done
               </Button>
             </div>
           </motion.div>

@@ -1,6 +1,7 @@
 /** Main header links (left nav) — order matters */
 export const MAIN_NAV = [
-  { href: "/", label: "About" },
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
   { href: "/gift-cards", label: "Gift Cards" },
   { href: "/testimonials", label: "Testimonials" },
