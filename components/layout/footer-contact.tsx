@@ -20,7 +20,7 @@ export function FooterContact() {
   if (!email) return null;
 
   return (
-    <div className="mt-10 flex justify-center">
+    <div className="mt-6 flex justify-center">
       <a
         href={`mailto:${email}`}
         className="inline-flex items-center gap-2 text-sm lowercase text-muted transition-colors hover:text-mauve-deep"

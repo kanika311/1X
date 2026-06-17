@@ -1,7 +1,6 @@
-const API = process.env.NEXT_PUBLIC_API_URL;
+import { getApiBaseUrl } from "@/lib/api-base";
+
 const TOKEN_KEY = "onex-token";
-console.log("NEXT_PUBLIC_API_URL =", process.env.NEXT_PUBLIC_API_URL);
-console.log("API =", API);
 
 export function getAuthToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -26,14 +25,19 @@ export async function apiRequest<T>(
     (h as Record<string, string>).Authorization = `Bearer ${token}`;
   }
 
+  const apiBase = getApiBaseUrl();
+  const url = `${apiBase}${path.startsWith("/") ? path : `/${path}`}`;
+
   let res: Response;
   try {
-    res = await fetch(`${API}${path}`, { ...rest, headers: h });
+    res = await fetch(url, { ...rest, headers: h });
   } catch {
-    throw new Error("Cannot reach API. Start onex-api on port 5000.");
+    throw new Error("Cannot reach API. Check your connection or API configuration.");
   }
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || "Request failed");
+  if (!res.ok) {
+    throw new Error((data as { message?: string }).message || `Request failed (${res.status})`);
+  }
   return data as T;
 }

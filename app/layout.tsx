@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 
 import { AppProviders } from "@/components/providers/app-providers";
-import { SiteShell } from "@/components/layout/site-shell";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,9 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={`${inter.variable} ${cormorant.variable} bg-background text-ink antialiased`}>
-        <AppProviders>
-          <SiteShell>{children}</SiteShell>
-        </AppProviders>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

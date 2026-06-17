@@ -29,7 +29,7 @@ type ShopContextValue = {
   wishlist: string[];
   cart: string[];
   toggleWishlist: (id: string) => void;
-  addToCart: (id: string) => void;
+  addToCart: (id: string, options?: { redirect?: boolean }) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => Promise<void>;
   removeCartItems: (cartKeys: string[]) => Promise<void>;
@@ -66,6 +66,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   }, [authReady, session, router, pathname]);
 
   const loadFromServer = useCallback(async () => {
+    if (pathname?.startsWith("/admin")) return;
     if (!isRegisteredUser(session)) {
       setWishlist([]);
       setCart([]);
@@ -83,7 +84,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     } finally {
       setShopLoading(false);
     }
-  }, [session, handleShopError]);
+  }, [session, handleShopError, pathname]);
 
   useEffect(() => {
     if (!authReady) return;
@@ -112,20 +113,23 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   );
 
   const addToCart = useCallback(
-    async (cartKey: string) => {
+    async (cartKey: string, options?: { redirect?: boolean }) => {
       if (!requireLogin()) return;
       clearShopError();
-      if (cart.includes(cartKey)) return;
-      const productId = offeringIdFromCartKey(cartKey);
-      try {
-        await addCartItem(productId);
-        setCart((prev) => [...prev, cartKey]);
-      } catch (e) {
-        handleShopError(e);
-        void loadFromServer();
+      if (!cart.includes(cartKey)) {
+        const productId = offeringIdFromCartKey(cartKey);
+        try {
+          await addCartItem(productId);
+          setCart((prev) => [...prev, cartKey]);
+        } catch (e) {
+          handleShopError(e);
+          void loadFromServer();
+          return;
+        }
       }
+      if (options?.redirect) router.push("/cart");
     },
-    [requireLogin, cart, loadFromServer, clearShopError, handleShopError],
+    [requireLogin, cart, loadFromServer, clearShopError, handleShopError, router],
   );
 
   const removeFromCart = useCallback(
@@ -204,7 +208,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   return (
     <ShopContext.Provider value={value}>
-      {shopError ? (
+      {shopError && !pathname?.startsWith("/admin") ? (
         <div
           role="alert"
           className="fixed bottom-4 left-1/2 z-[100] max-w-md -translate-x-1/2 rounded-xl border border-rose-200 bg-white px-4 py-3 text-sm text-ink shadow-lg"

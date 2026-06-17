@@ -8,7 +8,7 @@ import { ServiceIcon } from "@/components/services/service-icon";
 import { useShop } from "@/components/providers/shop-provider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { SoftImage } from "@/components/ui/soft-image";
+import { OfferingImage } from "@/components/services/offering-image";
 import { HealthcareFaqSection } from "@/components/services/healthcare-faq-section";
 import type { ServiceOffering } from "@/lib/data/service-catalog";
 import {
@@ -29,7 +29,14 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
   return (
     <article>
       <section className="relative min-h-[50vh] overflow-hidden">
-        <SoftImage src={offering.image} alt={offering.title} overlay="hero" rounded="none" priority sizes="100vw" className="min-h-[50vh]" />
+        <OfferingImage
+          offering={offering}
+          overlay="hero"
+          rounded="none"
+          priority
+          sizes="100vw"
+          className="min-h-[50vh]"
+        />
         <div className="relative mx-auto max-w-4xl px-4 pb-16 pt-28 text-center sm:px-6">
           <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl border border-rose-100 bg-white/90 text-mauve shadow-soft">
             <ServiceIcon name={offering.iconKey} className="text-2xl" />
@@ -63,7 +70,7 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
           <p className="mt-6 text-2xl font-semibold text-ink">{formatPrice(offering.price)}</p>
           <p className="mt-1 text-sm text-subtle">{offering.duration}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button onClick={() => addToCart(`${cartType}:${id}`)}>{offering.cta}</Button>
+            <Button onClick={() => addToCart(`${cartType}:${id}`, { redirect: true })}>{offering.cta}</Button>
             <Button variant="outline" onClick={() => toggleWishlist(id)}>
               <FiHeart className={wished ? "fill-rose-400 text-rose-400" : ""} /> Save
             </Button>
@@ -96,9 +103,9 @@ export function OfferingDetailLayout({ offering }: { offering: ServiceOffering }
           <h2 className="text-2xl text-ink">Start your journey</h2>
           <p className="mt-3 text-muted">Book {offering.title} or speak with our team for a personalized plan.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/contact">
-              <Button variant="default">{offering.cta}</Button>
-            </Link>
+            <Button variant="default" onClick={() => addToCart(`${cartType}:${id}`, { redirect: true })}>
+              {offering.cta}
+            </Button>
             <Link href={categoryPath(offering.domain, offering.category)}>
               <Button variant="outline">View category</Button>
             </Link>

@@ -4,7 +4,7 @@ import { offeringId, offeringPath, type ServiceOffering } from "@/lib/data/servi
 export type CatalogItem = Pick<
   ProductCardProps,
   "id" | "href" | "title" | "image" | "price" | "rating" | "duration" | "cta" | "bestseller" | "type"
-> & { catalogId: string };
+> & { catalogId: string; catalogImage?: string; domain?: ServiceOffering["domain"] };
 
 export function offeringToCatalogItem(o: ServiceOffering): CatalogItem {
   const isCourse = o.category === "courses";
@@ -14,6 +14,8 @@ export function offeringToCatalogItem(o: ServiceOffering): CatalogItem {
     href: offeringPath(o),
     title: o.title,
     image: o.image,
+    catalogImage: o.catalogImage,
+    domain: o.domain,
     price: o.price,
     rating: o.rating,
     duration: o.duration,

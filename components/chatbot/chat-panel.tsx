@@ -35,17 +35,23 @@ export function ChatPanel({
   className = "",
   bodyClassName = "",
 }: Props) {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = scrollRef.current;
+    if (!container) return;
+    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
   return (
     <div className={`flex flex-col overflow-hidden rounded-3xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] ${className}`}>
       <ChatHeader onClose={onClose} showEmail={showEmailInHeader} />
 
-      <div className={`flex-1 space-y-3 overflow-y-auto bg-white px-4 py-4 ${bodyClassName}`}>
+      <div
+        ref={scrollRef}
+        className={`flex-1 space-y-3 overflow-y-auto bg-white px-4 py-4 ${bodyClassName}`}
+      >
         {messages.map((m, i) => (
           <div
             key={`${i}-${m.text.slice(0, 8)}`}

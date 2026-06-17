@@ -23,7 +23,7 @@ function LoginPageContent() {
 
   if (!isReady) {
     return (
-      <div className="flex min-h-[calc(100dvh-72px)] items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="size-8 animate-pulse rounded-full bg-rose-200" />
       </div>
     );
@@ -32,7 +32,7 @@ function LoginPageContent() {
   if (isRegisteredUser(session)) return null;
 
   return (
-    <div className="relative min-h-[calc(100dvh-72px)] overflow-hidden bg-cream">
+    <div className="relative overflow-hidden bg-cream">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-20 top-0 size-[420px] rounded-full bg-rose-200/50 blur-3xl" />
         <div className="absolute bottom-0 right-0 size-[380px] rounded-full bg-peach-100/90 blur-3xl" />
@@ -67,7 +67,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-[calc(100dvh-72px)] items-center justify-center">
+        <div className="flex min-h-[40vh] items-center justify-center">
           <div className="size-8 animate-pulse rounded-full bg-rose-200" />
         </div>
       }

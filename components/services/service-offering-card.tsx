@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 
 import { ServiceIcon } from "@/components/services/service-icon";
+import { OfferingImage } from "@/components/services/offering-image";
 import { Button } from "@/components/ui/button";
-import { SoftImage } from "@/components/ui/soft-image";
 import type { ServiceOffering } from "@/lib/data/service-catalog";
 import { categoryPath, offeringPath } from "@/lib/data/service-catalog";
 import { formatPrice } from "@/lib/utils";
@@ -26,9 +26,8 @@ export function ServiceOfferingCard({ offering, index = 0 }: ServiceOfferingCard
     >
       <Link href={offeringPath(offering)} className="relative block">
         <div className="relative aspect-[4/3]">
-          <SoftImage
-            src={offering.image}
-            alt={offering.title}
+          <OfferingImage
+            offering={offering}
             overlay="card"
             rounded="none"
             sizes="(max-width:768px) 100vw, 33vw"

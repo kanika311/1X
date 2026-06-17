@@ -64,7 +64,7 @@ export function AboutHeroSlider({ initialSlides }: AboutHeroSliderProps) {
               />
             ) : (
               <SoftImage
-                src={slide.src}
+                src={mediaSrc}
                 alt={slide.alt || "Home hero slide"}
                 overlay="hero"
                 rounded="none"

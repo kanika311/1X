@@ -6,8 +6,17 @@ import {
   type ServiceOffering,
 } from "@/lib/data/service-catalog";
 import type { ServiceIconKey } from "@/lib/service-icons";
+import { getDomainFallbackImage } from "@/lib/image-fallback";
 import { resolveApiMediaUrl } from "@/lib/media-url";
 import { normalizeFaqList } from "@/lib/normalize-faq";
+
+function findStaticOffering(p: Pick<ApiProduct, "slug" | "domain" | "category">) {
+  const slug = p.slug.trim().toLowerCase();
+  return staticOfferings.find(
+    (o) =>
+      o.slug.toLowerCase() === slug && o.domain === p.domain && o.category === p.category,
+  );
+}
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -33,6 +42,11 @@ export type ApiProduct = {
 };
 
 export function productToOffering(p: ApiProduct): ServiceOffering {
+  const staticMatch = findStaticOffering(p);
+  const resolved = resolveApiMediaUrl(p.image);
+  const catalogImage = staticMatch?.image;
+  const image = resolved || catalogImage || getDomainFallbackImage(p.domain);
+
   return {
     slug: p.slug,
     domain: p.domain,
@@ -43,7 +57,8 @@ export function productToOffering(p: ApiProduct): ServiceOffering {
     price: Number(p.price) || 0,
     rating: Number(p.rating) || 4.8,
     reviews: Number(p.reviews) || 0,
-    image: resolveApiMediaUrl(p.image),
+    image,
+    catalogImage,
     iconKey: (p.iconKey || "shield") as ServiceIconKey,
     bestseller: Boolean(p.bestseller),
     benefits: Array.isArray(p.benefits) ? p.benefits : [],

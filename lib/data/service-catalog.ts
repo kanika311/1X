@@ -17,6 +17,8 @@ export type ServiceOffering = {
   rating: number;
   reviews: number;
   image: string;
+  /** Per-product static image used when admin upload is missing or broken. */
+  catalogImage?: string;
   iconKey: ServiceIconKey;
   bestseller?: boolean;
   benefits: string[];
@@ -84,7 +86,7 @@ const cyberCourses: Omit<ServiceOffering, "domain" | "category">[] = [
     price: 28999,
     rating: 4.9,
     reviews: 267,
-    image: IMG.course,
+    image: "/NetworkSecurity.jpeg",
     iconKey: "layers",
     benefits: ["Web & network focus", "OWASP Top 10", "Client-ready reports"],
     faq: [{ q: "Payment plans?", a: "EMI options available at checkout." }],
@@ -130,7 +132,7 @@ const cyberServices: Omit<ServiceOffering, "domain" | "category">[] = [
     price: 39999,
     rating: 4.8,
     reviews: 44,
-    image: IMG.heroCyber,
+    image: "/cybersecurity.jpeg",
     iconKey: "monitor",
     benefits: ["SIEM tuning", "Alert correlation", "Monthly reports"],
     faq: [{ q: "Onboarding time?", a: "Typically 2ΓÇô3 weeks for full integration." }],
@@ -144,7 +146,7 @@ const cyberServices: Omit<ServiceOffering, "domain" | "category">[] = [
     price: 74999,
     rating: 4.9,
     reviews: 38,
-    image: IMG.course,
+    image: "/cyber.jpeg",
     iconKey: "zap",
     benefits: ["Retainer options", "Forensic support", "Post-incident review"],
     faq: [{ q: "Response SLA?", a: "Critical incidents: within 1 hour for retainer clients." }],
@@ -158,7 +160,7 @@ const cyberServices: Omit<ServiceOffering, "domain" | "category">[] = [
     price: 29999,
     rating: 4.7,
     reviews: 29,
-    image: IMG.courseAlt,
+    image: "/soc.jpeg",
     iconKey: "trending-up",
     benefits: ["Sector-specific feeds", "Executive briefings", "IOC sharing"],
     faq: [{ q: "Integration?", a: "API feeds compatible with major SIEM platforms." }],

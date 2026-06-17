@@ -45,7 +45,9 @@ export function AboutLanding() {
       <AboutHeroSlider initialSlides={heroSlides} />
 
       <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-      <p className="mt-10 font-serif text-2xl italic leading-relaxed text-ink">{about.storyParagraph1}</p>
+        <p className="font-serif text-2xl italic leading-relaxed text-ink">{about.storyParagraph1}</p>
+      </section>
+
       <section className="bg-gradient-to-b from-rose-50/50 to-cream py-12 sm:py-20">
         <div className="mx-auto w-full max-w-xl px-4 sm:max-w-2xl sm:px-6 lg:max-w-3xl">
           <div className="rounded-3xl border border-rose-100/80 bg-white/60 p-6 shadow-soft sm:p-8">
@@ -54,8 +56,9 @@ export function AboutLanding() {
           </div>
         </div>
       </section>
-      
-        <p className="mt-10 text-lg leading-relaxed text-muted">
+
+      <section className="mx-auto max-w-3xl px-4 pb-20 text-center sm:px-6">
+        <p className="text-lg leading-relaxed text-muted">
           {storyLines.map((line, i) => (
             <span key={i}>
               {line}
@@ -64,8 +67,6 @@ export function AboutLanding() {
           ))}
         </p>
       </section>
-
-     
 
       <ServicesChooser embedded />
 

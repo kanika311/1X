@@ -6,6 +6,8 @@ import { FiHeart, FiStar } from "react-icons/fi";
 
 import { useShop } from "@/components/providers/shop-provider";
 import { SoftImage } from "@/components/ui/soft-image";
+import { getOfferingImageSources } from "@/lib/offering-image";
+import type { ServiceDomain } from "@/lib/data/service-catalog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, cn } from "@/lib/utils";
@@ -21,6 +23,8 @@ export type ProductCardProps = {
   cta: string;
   bestseller?: boolean;
   type: "course" | "service";
+  catalogImage?: string;
+  domain?: ServiceDomain;
 };
 
 export function ProductCard({
@@ -34,9 +38,16 @@ export function ProductCard({
   cta,
   bestseller,
   type,
+  catalogImage,
+  domain,
 }: ProductCardProps) {
   const { toggleWishlist, wishlist, addToCart } = useShop();
   const wished = wishlist.includes(id);
+  const imageSources = getOfferingImageSources({
+    image,
+    catalogImage,
+    domain: domain ?? (type === "course" ? "cyber" : "physio"),
+  });
 
   return (
     <motion.article
@@ -50,7 +61,8 @@ export function ProductCard({
       <Link href={href} className="relative block shadow-soft transition-shadow duration-500 hover:shadow-glow">
         <div className="relative aspect-[3/4]">
           <SoftImage
-            src={image}
+            src={imageSources[0] ?? image}
+            fallbackChain={imageSources.slice(1)}
             alt={title}
             overlay="card"
             rounded="2xl"
@@ -93,7 +105,7 @@ export function ProductCard({
           variant="outline"
           size="sm"
           className="w-full sm:w-auto"
-          onClick={() => addToCart(`${type}:${id}`)}
+          onClick={() => addToCart(`${type}:${id}`, { redirect: true })}
         >
           {cta}
         </Button>

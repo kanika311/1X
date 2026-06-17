@@ -53,7 +53,7 @@ export type SiteContent = {
 export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
   { mediaType: "image", src: "/cyber.png", alt: "Cybersecurity" },
   { mediaType: "image", src: IMG.about, alt: "Wellness studio" },
-  { mediaType: "image", src: "/Logo.jpeg", alt: "1X" },
+  { mediaType: "image", src: "/LOGO.jpeg", alt: "1X" },
 ];
 
 export const DEFAULT_FOUNDER: FounderContent = {

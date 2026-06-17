@@ -89,7 +89,7 @@ export function ProductDetailLayout(props: DetailProps) {
             ))}
           </ul>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Button onClick={() => addToCart(`${props.type}:${props.id}`)}>{props.cta}</Button>
+            <Button onClick={() => addToCart(`${props.type}:${props.id}`, { redirect: true })}>{props.cta}</Button>
             <Button variant="outline" onClick={() => toggleWishlist(props.id)}>
               <FiHeart className={wished ? "fill-red-500 text-red-500" : ""} /> Wishlist
             </Button>
