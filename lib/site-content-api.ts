@@ -32,6 +32,13 @@ export type HeroSlide = {
   alt: string;
 };
 
+export type VideoSliderItem = {
+  title: string;
+  subtitle: string;
+  videoSrc: string;
+  posterSrc: string;
+};
+
 export type PaymentContent = {
   upiId: string;
   upiPayeeName: string;
@@ -43,6 +50,7 @@ export type SiteContent = {
   about: AboutContent;
   founder?: FounderContent;
   homeHeroSlides?: HeroSlide[];
+  homeVideoSlides?: VideoSliderItem[];
   contact: ContactContent;
   payment?: PaymentContent;
   privacy: LegalDoc;
@@ -98,6 +106,19 @@ export const DEFAULT_CONTACT: ContactContent = {
 export function resolveHeroSlides(content: SiteContent | null): HeroSlide[] {
   const slides = content?.homeHeroSlides?.filter((s) => s.src?.trim()) ?? [];
   return slides.length > 0 ? slides : DEFAULT_HERO_SLIDES;
+}
+
+export function resolveVideoSlides(content: SiteContent | null): VideoSliderItem[] {
+  return (
+    content?.homeVideoSlides
+      ?.map((item) => ({
+        title: item.title?.trim() ?? "",
+        subtitle: item.subtitle?.trim() ?? "",
+        videoSrc: item.videoSrc?.trim() ?? "",
+        posterSrc: item.posterSrc?.trim() ?? "",
+      }))
+      .filter((item) => item.videoSrc) ?? []
+  );
 }
 
 export function resolveFounderFields(content: SiteContent | null): FounderContent {

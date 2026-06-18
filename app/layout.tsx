@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   description:
     "Premium cybersecurity courses and luxury physiotherapy by Dr. Ayxh — secure your future, heal your life.",
   keywords: ["cybersecurity courses", "physiotherapy", "Dr. Ayxh", "ethical hacking", "SOC analyst"],
+  icons: {
+    icon: "/LOGO.jpeg",
+    shortcut: "/LOGO.jpeg",
+    apple: "/LOGO.jpeg",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

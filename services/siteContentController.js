@@ -69,6 +69,18 @@ function normalizeHeroSlides(slides) {
     .filter((slide) => slide.src.trim());
 }
 
+function normalizeVideoSlides(slides) {
+  if (!Array.isArray(slides)) return [];
+  return slides
+    .map((item) => ({
+      title: safeString(item?.title),
+      subtitle: safeString(item?.subtitle),
+      videoSrc: safeString(item?.videoSrc),
+      posterSrc: safeString(item?.posterSrc),
+    }))
+    .filter((item) => item.videoSrc.trim());
+}
+
 export async function getSiteContent(_req, res) {
   const doc = await SiteContent.findOne({ key: "default" }).lean();
   res.json({ success: true, content: doc || null });
@@ -81,6 +93,7 @@ export async function upsertSiteContent(req, res) {
     about: normalizeAbout(body.about),
     founder: normalizeFounder(body.founder),
     homeHeroSlides: normalizeHeroSlides(body.homeHeroSlides),
+    homeVideoSlides: normalizeVideoSlides(body.homeVideoSlides),
     contact: normalizeContact(body.contact),
     payment: normalizePayment(body.payment),
     privacy: normalizeLegal(body.privacy),

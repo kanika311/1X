@@ -22,7 +22,7 @@ export function getStoredAdmin(): AdminUser | null {
 }
 
 export async function requestPasswordReset(email: string) {
-  return apiFetch<{ message: string; emailSent?: boolean; devResetUrl?: string }>("/auth/forgot-password", {
+  return apiFetch<{ success: boolean; message: string }>("/auth/forgot-password", {
     method: "POST",
     body: { email },
   });

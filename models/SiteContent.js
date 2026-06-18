@@ -60,6 +60,16 @@ const heroSlideSchema = new mongoose.Schema(
   { _id: false },
 );
 
+const videoSliderItemSchema = new mongoose.Schema(
+  {
+    title: { type: String, default: "" },
+    subtitle: { type: String, default: "" },
+    videoSrc: { type: String, default: "" },
+    posterSrc: { type: String, default: "" },
+  },
+  { _id: false },
+);
+
 const founderSchema = new mongoose.Schema(
   {
     eyebrow: { type: String, default: "" },
@@ -77,6 +87,7 @@ const siteContentSchema = new mongoose.Schema(
     about: { type: aboutSchema, default: () => ({}) },
     founder: { type: founderSchema, default: () => ({}) },
     homeHeroSlides: { type: [heroSlideSchema], default: [] },
+    homeVideoSlides: { type: [videoSliderItemSchema], default: [] },
     contact: { type: contactSchema, default: () => ({}) },
     payment: { type: paymentSchema, default: () => ({}) },
     privacy: { type: legalDocSchema, default: () => ({}) },

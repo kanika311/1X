@@ -17,7 +17,6 @@ const schema = Yup.object({
 
 export default function ForgotPasswordPage() {
   const [message, setMessage] = useState("");
-  const [devLink, setDevLink] = useState("");
   const [error, setError] = useState("");
 
   return (
@@ -34,14 +33,9 @@ export default function ForgotPasswordPage() {
           onSubmit={async (values, { setSubmitting }) => {
             setError("");
             setMessage("");
-            setDevLink("");
             try {
               const data = await requestPasswordReset(values.email.trim().toLowerCase());
               setMessage(data.message);
-              if (data.devResetUrl) setDevLink(data.devResetUrl);
-              if (data.emailSent === false && !data.devResetUrl) {
-                setError("Could not send email. Ask your developer to configure SMTP on the API server.");
-              }
             } catch (e) {
               setError(e instanceof Error ? e.message : "Could not send reset link");
             } finally {
@@ -71,19 +65,6 @@ export default function ForgotPasswordPage() {
               {message ? (
                 <div className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-ink">
                   <p>{message}</p>
-                  {devLink ? (
-                    <div className="mt-3 space-y-2">
-                      <p className="text-xs text-muted">
-                        SMTP is not set up on the API — open this link to reset your password:
-                      </p>
-                      <a
-                        href={devLink}
-                        className="block break-all rounded-md bg-white px-3 py-2 text-xs font-medium text-mauve-deep underline"
-                      >
-                        {devLink}
-                      </a>
-                    </div>
-                  ) : null}
                 </div>
               ) : null}
               {error ? <p className="text-sm text-red-500">{error}</p> : null}

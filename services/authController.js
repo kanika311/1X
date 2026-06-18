@@ -1,7 +1,7 @@
 import { User } from "@/models/User.js";
 import { signToken } from "@/lib/server/jwt.js";
 import { ApiError, normalizePhone } from "@/lib/server/helpers.js";
-import { sendPasswordResetEmail } from "@/lib/server/email.js";
+import { isEmailConfigured, sendPasswordResetEmail } from "@/lib/server/email";
 import crypto from "crypto";
 
 function userDto(user) {
@@ -102,6 +102,15 @@ function hashResetToken(token) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
+function getFrontendUrl() {
+  const raw =
+    process.env.FRONTEND_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.ADMIN_APP_URL || "").replace(/\/admin\/?$/, "") ||
+    "http://localhost:3000";
+  return String(raw).replace(/\/$/, "");
+}
+
 export async function forgotPassword(req, res) {
   const email = String(req.body.email || "")
     .trim()
@@ -111,11 +120,20 @@ export async function forgotPassword(req, res) {
     throw new ApiError(400, "Enter a valid email address");
   }
 
-  const message = "If an admin account exists for that email, we sent a password reset link.";
+  const successMessage = "Password reset link sent to your email.";
   const user = await User.findOne({ email, role: "admin" });
 
   if (!user) {
-    return res.json({ success: true, message });
+    return res.json({ success: true, message: successMessage });
+  }
+
+  if (!isEmailConfigured()) {
+    console.error("[forgot-password] EMAIL_USER and EMAIL_PASS are not configured");
+    const devHint =
+      process.env.NODE_ENV === "development"
+        ? " Add EMAIL_USER and EMAIL_PASS (Gmail App Password) to .env.local, then restart npm run dev."
+        : "";
+    throw new ApiError(500, `Email service is not configured.${devHint}`);
   }
 
   const rawToken = crypto.randomBytes(32).toString("hex");
@@ -123,29 +141,25 @@ export async function forgotPassword(req, res) {
   user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
   await user.save();
 
-  const adminAppUrl = (process.env.ADMIN_APP_URL || "http://localhost:3001").replace(/\/$/, "");
-  const resetUrl = `${adminAppUrl}/reset-password?token=${rawToken}`;
+  const resetUrl = `${getFrontendUrl()}/admin/reset-password?token=${rawToken}`;
 
   try {
-    const result = await sendPasswordResetEmail({
+    await sendPasswordResetEmail({
       to: email,
       name: user.name,
       resetUrl,
     });
 
-    res.json({
-      success: true,
-      message: result.dev
-        ? "Email is not configured on the server yet. Use the reset link below."
-        : message,
-      emailSent: !result.dev,
-      ...(result.dev ? { devResetUrl: resetUrl } : {}),
-    });
-  } catch {
+    console.info("[forgot-password] Reset email queued", { email });
+    res.json({ success: true, message: successMessage });
+  } catch (err) {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
-    throw new ApiError(500, "Could not send reset email. Check SMTP settings on the API.");
+
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[forgot-password] Failed to send reset email", { email, error: detail });
+    throw new ApiError(500, "Could not send reset email. Please try again later.");
   }
 }
 
