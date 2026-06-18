@@ -210,10 +210,11 @@ function CommitmentReward() {
 
 function SpinAndWin() {
   return (
-    <section className="bg-gradient-to-b from-rose-50/60 to-background py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-gradient-to-b from-rose-50/70 via-cream/40 to-background py-20 sm:py-24">
+      <div className="pointer-events-none absolute -left-32 top-20 size-64 rounded-full bg-rose-200/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 bottom-10 size-72 rounded-full bg-peach-100/30 blur-3xl" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
-         
           title="Spin & Win Rewards"
           description="Spin the wheel to win discounts on your next purchase."
         />

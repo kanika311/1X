@@ -1,15 +1,18 @@
 "use client";
 
 import { Formik } from "formik";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import * as Yup from "yup";
 
 import { ImageUploadField } from "@/components/admin/image-upload-field";
+import { VideoUploadField } from "@/components/admin/video-upload-field";
 import { apiFetch } from "@/lib/api";
 import {
   DEFAULT_FOUNDER,
   DEFAULT_HERO_SLIDES,
+  DEFAULT_VIDEO_SLIDES,
   type HeroSlide,
+  type VideoSliderItem,
 } from "@/lib/site-content-api";
 
 type LegalSection = { heading: string; body: string };
@@ -49,6 +52,7 @@ type SiteContent = {
   about: About;
   founder?: Founder;
   homeHeroSlides?: HeroSlide[];
+  homeVideoSlides?: VideoSliderItem[];
   contact: Contact;
   payment?: Payment;
   privacy: LegalDoc;
@@ -77,6 +81,35 @@ function legalTextToSections(text: string): LegalSection[] {
     .filter((s) => s.heading || s.body);
 }
 
+function buildSiteContentPayload(
+  content: SiteContent,
+  heroes: HeroSlide[],
+  videos: VideoSliderItem[],
+) {
+  return {
+    about: content.about,
+    founder: content.founder ?? { eyebrow: "", title: "", body: "", image: "" },
+    homeHeroSlides: heroes
+      .map((slide) => ({
+        mediaType: slide.mediaType === "video" ? "video" : "image",
+        src: slide.src.trim(),
+        alt: slide.alt.trim(),
+      }))
+      .filter((slide) => slide.src),
+    homeVideoSlides: videos
+      .map((item) => ({
+        title: item.title.trim(),
+        subtitle: item.subtitle.trim(),
+        videoSrc: item.videoSrc.trim(),
+      }))
+      .filter((item) => item.videoSrc),
+    contact: content.contact,
+    payment: content.payment ?? { upiId: "", upiPayeeName: "", qrImage: "" },
+    privacy: content.privacy,
+    terms: content.terms,
+  };
+}
+
 const schema = Yup.object({
   contactHeadline: Yup.string().required(),
   contactEmail: Yup.string().email().required(),
@@ -90,9 +123,35 @@ const schema = Yup.object({
 export default function SiteContentPage() {
   const [initial, setInitial] = useState<SiteContent | null>(null);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(DEFAULT_HERO_SLIDES);
+  const [videoSlides, setVideoSlides] = useState<VideoSliderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  const persistVideoSlides = useCallback(
+    async (nextSlides: VideoSliderItem[]) => {
+      setVideoSlides(nextSlides);
+      if (!initial) {
+        setMessage("Removed. Save site content once to store changes.");
+        return;
+      }
+      try {
+        setError("");
+        const res = await apiFetch<{ content: SiteContent }>("/site-content", {
+          method: "PUT",
+          body: buildSiteContentPayload(initial, heroSlides, nextSlides),
+        });
+        setInitial(res.content);
+        setVideoSlides(
+          Array.isArray(res.content?.homeVideoSlides) ? res.content.homeVideoSlides : [],
+        );
+        setMessage("Video slides updated.");
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Could not save video change");
+      }
+    },
+    [initial, heroSlides],
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -101,6 +160,13 @@ export default function SiteContentPage() {
         setInitial(d.content);
         const slides = d.content?.homeHeroSlides?.filter((s) => s.src?.trim()) ?? [];
         setHeroSlides(slides.length > 0 ? slides : DEFAULT_HERO_SLIDES);
+        if (!d.content) {
+          setVideoSlides(DEFAULT_VIDEO_SLIDES);
+        } else if (Array.isArray(d.content.homeVideoSlides)) {
+          setVideoSlides(d.content.homeVideoSlides);
+        } else {
+          setVideoSlides([]);
+        }
       })
       .catch(() => setInitial(null))
       .finally(() => setLoading(false));
@@ -168,7 +234,7 @@ export default function SiteContentPage() {
     <div className="max-w-4xl">
       <h1 className="font-serif text-3xl text-ink">Site content</h1>
       <p className="mt-2 text-sm text-muted">
-        Edit homepage slider, About page founder bio, contact, UPI payment QR, Privacy Policy, and Terms.
+        Edit homepage slider, video carousel, About page founder bio, contact, UPI payment QR, Privacy Policy, and Terms.
       </p>
 
       <Formik
@@ -199,6 +265,13 @@ export default function SiteContentPage() {
                   alt: slide.alt.trim(),
                 }))
                 .filter((slide) => slide.src),
+              homeVideoSlides: videoSlides
+                .map((item) => ({
+                  title: item.title.trim(),
+                  subtitle: item.subtitle.trim(),
+                  videoSrc: item.videoSrc.trim(),
+                }))
+                .filter((item) => item.videoSrc),
               contact: {
                 headline: values.contactHeadline.trim(),
                 subheadline: values.contactSubheadline.trim(),
@@ -225,7 +298,11 @@ export default function SiteContentPage() {
               },
             };
 
-            await apiFetch("/site-content", { method: "PUT", body: payload });
+            const res = await apiFetch<{ content: SiteContent }>("/site-content", { method: "PUT", body: payload });
+            setInitial(res.content);
+            setVideoSlides(
+              Array.isArray(res.content?.homeVideoSlides) ? res.content.homeVideoSlides : [],
+            );
             setMessage("Saved. Refresh the website to see updates.");
           } catch (e) {
             setError(e instanceof Error ? e.message : "Save failed");
@@ -321,6 +398,88 @@ export default function SiteContentPage() {
                   type="button"
                   onClick={() =>
                     setHeroSlides((prev) => [...prev, { mediaType: "image", src: "", alt: "" }])
+                  }
+                  className="rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-mauve-deep hover:bg-rose-50"
+                >
+                  + Add slide
+                </button>
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-rose-100 bg-white p-6 shadow-sm">
+              <h2 className="font-serif text-xl text-ink">Homepage video slider</h2>
+              <p className="mt-1 text-xs text-muted">
+                Video carousel after the alignment text. Removing a slide saves immediately.
+              </p>
+              <div className="mt-6 space-y-6">
+                {videoSlides.length === 0 ? (
+                  <p className="text-sm text-muted">No video slides yet. Add one below or save to clear the homepage carousel.</p>
+                ) : null}
+                {videoSlides.map((item, index) => (
+                  <div key={`video-slide-${index}-${item.videoSrc}`} className="rounded-xl border border-rose-100 bg-rose-50/30 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-ink">Slide {index + 1}</p>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          void persistVideoSlides(videoSlides.filter((_, i) => i !== index));
+                        }}
+                        className="text-xs font-semibold uppercase text-red-600 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="text-xs font-semibold uppercase text-muted">Title</label>
+                        <input
+                          className={inputClass}
+                          value={item.title}
+                          onChange={(e) =>
+                            setVideoSlides((prev) =>
+                              prev.map((s, i) => (i === index ? { ...s, title: e.target.value } : s)),
+                            )
+                          }
+                          placeholder="1X by Dr. Ayxh"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold uppercase text-muted">Subtitle</label>
+                        <input
+                          className={inputClass}
+                          value={item.subtitle}
+                          onChange={(e) =>
+                            setVideoSlides((prev) =>
+                              prev.map((s, i) => (i === index ? { ...s, subtitle: e.target.value } : s)),
+                            )
+                          }
+                          placeholder="Wellness × Cyber"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <VideoUploadField
+                        label="Video"
+                        value={item.videoSrc}
+                        onChange={(url) => {
+                          const next = videoSlides.map((s, i) =>
+                            i === index ? { ...s, videoSrc: url } : s,
+                          );
+                          if (!url.trim()) {
+                            void persistVideoSlides(next);
+                          } else {
+                            setVideoSlides(next);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVideoSlides((prev) => [...prev, { title: "", subtitle: "", videoSrc: "" }])
                   }
                   className="rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-mauve-deep hover:bg-rose-50"
                 >

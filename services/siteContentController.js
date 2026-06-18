@@ -76,7 +76,6 @@ function normalizeVideoSlides(slides) {
       title: safeString(item?.title),
       subtitle: safeString(item?.subtitle),
       videoSrc: safeString(item?.videoSrc),
-      posterSrc: safeString(item?.posterSrc),
     }))
     .filter((item) => item.videoSrc.trim());
 }

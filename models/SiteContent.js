@@ -65,7 +65,6 @@ const videoSliderItemSchema = new mongoose.Schema(
     title: { type: String, default: "" },
     subtitle: { type: String, default: "" },
     videoSrc: { type: String, default: "" },
-    posterSrc: { type: String, default: "" },
   },
   { _id: false },
 );

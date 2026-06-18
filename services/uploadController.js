@@ -18,7 +18,7 @@ export async function listMedia(_req, res) {
   const files = await fs.readdir(UPLOAD_DIR);
   const images = [];
   for (const name of files) {
-    if (!/\.(jpe?g|png|webp|gif)$/i.test(name)) continue;
+    if (!/\.(jpe?g|png|webp|gif|mp4|webm|mov|m4v)$/i.test(name)) continue;
     const stat = await fs.stat(path.join(UPLOAD_DIR, name));
     if (!stat.isFile()) continue;
     images.push({

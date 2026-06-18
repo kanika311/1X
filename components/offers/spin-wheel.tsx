@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiCheck, FiCopy, FiX } from "react-icons/fi";
+import { FiCheck, FiCopy, FiGift, FiX } from "react-icons/fi";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,16 +20,64 @@ import {
 import { cn } from "@/lib/utils";
 
 const DEG_PER_SEGMENT = 360 / SPIN_DISPLAY_SEGMENT_COUNT;
-const WHEEL_COLORS = ["#f3dce4", "#fceee8", "#e8c4d0", "#fdf5f7", "#efd4de", "#f5d6e0"];
+
+function segmentColor(pct: number, index: number) {
+  if (pct <= 5) {
+    return index % 2 === 0 ? "#e8c4d0" : "#d9a8b8";
+  }
+  return index % 2 === 0 ? "#fdf5f7" : "#fceee8";
+}
+
+function WheelDividers() {
+  return (
+    <svg viewBox="0 0 200 200" className="pointer-events-none absolute inset-0 size-full" aria-hidden>
+      {Array.from({ length: SPIN_DISPLAY_SEGMENT_COUNT }).map((_, i) => {
+        const angle = (i / SPIN_DISPLAY_SEGMENT_COUNT) * 360 - 90;
+        const rad = (angle * Math.PI) / 180;
+        const x1 = 100 + 18 * Math.cos(rad);
+        const y1 = 100 + 18 * Math.sin(rad);
+        const x2 = 100 + 96 * Math.cos(rad);
+        const y2 = 100 + 96 * Math.sin(rad);
+        return (
+          <line
+            key={i}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            stroke="white"
+            strokeWidth="1.25"
+            opacity="0.65"
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
+function WheelPegs() {
+  return (
+    <svg viewBox="0 0 200 200" className="pointer-events-none absolute inset-0 size-full" aria-hidden>
+      {Array.from({ length: SPIN_DISPLAY_SEGMENT_COUNT }).map((_, i) => {
+        const angle = (i / SPIN_DISPLAY_SEGMENT_COUNT) * 360 - 90;
+        const rad = (angle * Math.PI) / 180;
+        const x = 100 + 94 * Math.cos(rad);
+        const y = 100 + 94 * Math.sin(rad);
+        return <circle key={i} cx={x} cy={y} r="2.2" className="fill-white" opacity="0.9" />;
+      })}
+    </svg>
+  );
+}
 
 function WheelLabels() {
   return (
-    <svg viewBox="0 0 200 200" className="pointer-events-none absolute inset-0 size-full">
+    <svg viewBox="0 0 200 200" className="pointer-events-none absolute inset-0 size-full" aria-hidden>
       {SPIN_DISPLAY_PERCENTS.map((pct, i) => {
         const angle = ((i + 0.5) / SPIN_DISPLAY_SEGMENT_COUNT) * 360 - 90;
         const rad = (angle * Math.PI) / 180;
-        const x = 100 + 62 * Math.cos(rad);
-        const y = 100 + 62 * Math.sin(rad);
+        const x = 100 + 70 * Math.cos(rad);
+        const y = 100 + 70 * Math.sin(rad);
+        const isWin = pct <= 5;
         return (
           <text
             key={i}
@@ -37,7 +85,11 @@ function WheelLabels() {
             y={y}
             textAnchor="middle"
             dominantBaseline="middle"
-            className="fill-mauve-deep text-[8px] font-bold sm:text-[9px]"
+            transform={`rotate(${angle + 90}, ${x}, ${y})`}
+            className={cn(
+              "text-[6.5px] font-bold sm:text-[7.5px]",
+              isWin ? "fill-mauve-deep" : "fill-muted/70",
+            )}
             style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
           >
             {pct}%
@@ -56,10 +108,10 @@ export function SpinWheel() {
   const [won, setWon] = useState<StoredSpin | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const conicStops = SPIN_DISPLAY_PERCENTS.map((_, i) => {
+  const conicStops = SPIN_DISPLAY_PERCENTS.map((pct, i) => {
     const start = (i / SPIN_DISPLAY_SEGMENT_COUNT) * 100;
     const end = ((i + 1) / SPIN_DISPLAY_SEGMENT_COUNT) * 100;
-    return `${WHEEL_COLORS[i % WHEEL_COLORS.length]} ${start}% ${end}%`;
+    return `${segmentColor(pct, i)} ${start}% ${end}%`;
   }).join(", ");
 
   useEffect(() => {
@@ -128,7 +180,7 @@ export function SpinWheel() {
                 <FiX />
               </button>
               <p className="text-[10px] uppercase tracking-wider text-rose-100/90">Spin & Win</p>
-              <h3 className=" text-xl">You won {won.percent}% off!</h3>
+              <h3 className="text-xl">You won {won.percent}% off!</h3>
             </div>
             <div className="px-4 py-4 text-center">
               <p className="text-sm text-muted">Use this code in your cart before checkout.</p>
@@ -159,47 +211,87 @@ export function SpinWheel() {
     ) : null;
 
   return (
-    <div className="mt-12 grid items-center gap-10 lg:grid-cols-2">
-      <div className="relative mx-auto flex size-72 items-center justify-center sm:size-80">
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-rose-100 via-white to-peach-100 shadow-glow" />
-        <motion.div
-          className="relative size-[88%] rounded-full border-4 border-white shadow-soft"
-          style={{ background: `conic-gradient(from -90deg, ${conicStops})` }}
-          animate={{ rotate: rotation }}
-          transition={{ duration: 4, ease: [0.2, 0.8, 0.2, 1] }}
-        >
-          <WheelLabels />
-        </motion.div>
-        <button
-          type="button"
-          disabled={spinning}
-          onClick={spin}
-          className={cn(
-            "absolute z-10 flex size-16 items-center justify-center rounded-full border-4 border-white bg-mauve text-sm text-white shadow-glow transition",
-            "hover:bg-mauve-deep disabled:opacity-70",
-          )}
-          aria-label="Spin the wheel"
-        >
-          {spinning ? "…" : "SPIN"}
-        </button>
-        <div className="pointer-events-none absolute -top-2 left-1/2 z-20 -translate-x-1/2 border-x-8 border-b-[14px] border-x-transparent border-b-mauve" />
+    <div className="mt-14 grid items-center gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
+      {/* Wheel */}
+      <div className="relative mx-auto w-full max-w-[22rem] sm:max-w-[26rem]">
+        <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-rose-200/40 via-rose-100/20 to-peach-100/30 blur-2xl" />
+        <div className="relative aspect-square">
+          {/* Outer ring */}
+          <div className="absolute inset-0 rounded-full border-[10px] border-white bg-gradient-to-br from-rose-100 to-rose-50 shadow-glow" />
+          <div className="absolute inset-3 rounded-full border border-rose-200/60" />
+
+          {/* Pointer */}
+          <div className="pointer-events-none absolute left-1/2 top-0 z-30 -translate-x-1/2">
+            <div className="flex flex-col items-center">
+              <div className="size-3 rounded-full border-2 border-white bg-mauve-deep shadow-md" />
+              <div className="h-0 w-0 border-x-[10px] border-t-[16px] border-x-transparent border-t-mauve-deep drop-shadow-sm" />
+            </div>
+          </div>
+
+          {/* Spinning disc */}
+          <motion.div
+            className="absolute inset-[14px] overflow-hidden rounded-full border-4 border-white shadow-soft"
+            style={{ background: `conic-gradient(from -90deg, ${conicStops})` }}
+            animate={{ rotate: rotation }}
+            transition={{ duration: 4, ease: [0.2, 0.8, 0.2, 1] }}
+          >
+            <WheelDividers />
+            <WheelPegs />
+            <WheelLabels />
+          </motion.div>
+
+          {/* Center hub */}
+          <button
+            type="button"
+            disabled={spinning}
+            onClick={spin}
+            className={cn(
+              "absolute left-1/2 top-1/2 z-20 flex size-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full",
+              "border-4 border-white bg-gradient-to-br from-mauve via-mauve-deep to-mauve text-xs font-bold tracking-widest text-white shadow-glow",
+              "transition hover:scale-105 hover:shadow-[0_20px_48px_-12px_rgb(107_69_82/0.45)] disabled:scale-100 disabled:opacity-70",
+            )}
+            aria-label="Spin the wheel"
+          >
+            {spinning ? (
+              <span className="animate-pulse">…</span>
+            ) : (
+              "SPIN"
+            )}
+          </button>
+        </div>
       </div>
 
-      <div>
-        {/* <p className="text-base text-muted">
-          Six slices from <strong>0% to 5% off</strong>. Spin, copy your code, then apply it in the cart.
-        </p> */}
-        <Button type="button" className="mt-6" disabled={spinning} onClick={spin}>
-          {spinning ? "Spinning…" : "Spin the wheel"}
-        </Button>
-        {won ? (
-          <p className="mt-3 text-xs text-muted">
-            Last spin:{" "}
-            <span className="font-medium text-ink">
-              {won.percent}% off · {won.code}
-            </span>
+      {/* CTA panel */}
+      <div className="flex flex-col justify-center">
+        <div className="rounded-3xl border border-rose-100/90 bg-white/80 p-8 shadow-soft backdrop-blur-sm sm:p-10">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-100 to-rose-50 text-mauve-deep">
+            <FiGift className="size-6" />
+          </div>
+          <p className="eyebrow mt-6">Try your luck</p>
+          <h3 className="mt-2 font-serif text-3xl text-ink">Spin to win rewards</h3>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            Spin the wheel, copy your unique code, and apply it in your cart before checkout.
           </p>
-        ) : null}
+
+          <Button
+            type="button"
+            className="mt-8 w-full px-8 py-6 text-sm font-semibold uppercase tracking-wider sm:w-auto"
+            disabled={spinning}
+            onClick={spin}
+          >
+            {spinning ? "Spinning…" : "Spin the wheel"}
+          </Button>
+
+          {won ? (
+            <div className="mt-6 rounded-2xl border border-rose-100 bg-gradient-to-br from-rose-50/80 to-white px-5 py-4">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-subtle">Your last spin</p>
+              <p className="mt-1 font-serif text-2xl text-mauve-deep">{won.percent}% off</p>
+              <p className="mt-2 font-mono text-sm font-medium text-ink">{won.code}</p>
+            </div>
+          ) : (
+            <p className="mt-6 text-xs text-subtle">One spin per session · codes valid on your next purchase</p>
+          )}
+        </div>
       </div>
 
       {mounted && resultModal ? createPortal(resultModal, document.body) : null}

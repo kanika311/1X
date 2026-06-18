@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 
 import { AboutChatbotSection } from "@/components/about/about-chatbot-section";
 import { AboutHeroSlider } from "@/components/about/about-hero-slider";
+import { VideoSlider } from "@/components/about/video-slider";
 import { ServicesChooser } from "@/components/services/services-chooser";
 import {
   DEFAULT_ABOUT,
   fetchSiteContent,
   resolveHeroSlides,
+  resolveVideoSlides,
   type AboutContent,
   type HeroSlide,
+  type VideoSliderItem,
 } from "@/lib/site-content-api";
 
 function mergeAbout(raw?: Partial<AboutContent> | null): AboutContent {
@@ -25,16 +28,19 @@ function mergeAbout(raw?: Partial<AboutContent> | null): AboutContent {
 export function AboutLanding() {
   const [about, setAbout] = useState<AboutContent>(DEFAULT_ABOUT);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[] | undefined>(undefined);
+  const [videoSlides, setVideoSlides] = useState<VideoSliderItem[] | undefined>(undefined);
 
   useEffect(() => {
     fetchSiteContent()
       .then((content) => {
         setAbout(mergeAbout(content?.about));
         setHeroSlides(resolveHeroSlides(content));
+        setVideoSlides(resolveVideoSlides(content));
       })
       .catch(() => {
         setAbout(DEFAULT_ABOUT);
         setHeroSlides(undefined);
+        setVideoSlides(resolveVideoSlides(null));
       });
   }, []);
 
@@ -67,6 +73,8 @@ export function AboutLanding() {
           ))}
         </p>
       </section>
+
+      <VideoSlider initialSlides={videoSlides} />
 
       <ServicesChooser embedded />
 

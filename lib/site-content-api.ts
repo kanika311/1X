@@ -36,7 +36,6 @@ export type VideoSliderItem = {
   title: string;
   subtitle: string;
   videoSrc: string;
-  posterSrc: string;
 };
 
 export type PaymentContent = {
@@ -62,6 +61,44 @@ export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
   { mediaType: "image", src: "/cyber.png", alt: "Cybersecurity" },
   { mediaType: "image", src: IMG.about, alt: "Wellness studio" },
   { mediaType: "image", src: "/LOGO.jpeg", alt: "1X" },
+];
+
+export const DEFAULT_VIDEO_SLIDES: VideoSliderItem[] = [
+  {
+    title: "1X by Dr. Ayxh",
+    subtitle: "Wellness × Cyber — where body and code find balance.",
+    videoSrc: "/video1.mp4",
+  },
+  {
+    title: "Cybersecurity Academy",
+    subtitle: "SOC, ethical hacking, and hands-on defense labs.",
+    videoSrc: "/video1.mp4",
+  },
+  {
+    title: "Luxury Physiotherapy",
+    subtitle: "Recovery programs with Dr. Ayxh’s signature care.",
+    videoSrc: "/video1.mp4",
+  },
+  {
+    title: "Secure Your Future",
+    subtitle: "Learn skills that employers need right now.",
+    videoSrc: "/video1.mp4",
+  },
+  {
+    title: "Heal Your Life",
+    subtitle: "Movement, posture, and confidence restored.",
+    videoSrc: "/video1.mp4",
+  },
+  {
+    title: "Balance Is Everything",
+    subtitle: "Alignment in the body, encryption in the code.",
+    videoSrc: "/video1.mp4",
+  },
+  {
+    title: "The 1X Experience",
+    subtitle: "Premium care and cutting-edge education in one place.",
+    videoSrc: "/video1.mp4",
+  },
 ];
 
 export const DEFAULT_FOUNDER: FounderContent = {
@@ -109,16 +146,15 @@ export function resolveHeroSlides(content: SiteContent | null): HeroSlide[] {
 }
 
 export function resolveVideoSlides(content: SiteContent | null): VideoSliderItem[] {
-  return (
-    content?.homeVideoSlides
-      ?.map((item) => ({
-        title: item.title?.trim() ?? "",
-        subtitle: item.subtitle?.trim() ?? "",
-        videoSrc: item.videoSrc?.trim() ?? "",
-        posterSrc: item.posterSrc?.trim() ?? "",
-      }))
-      .filter((item) => item.videoSrc) ?? []
-  );
+  if (content === null) return DEFAULT_VIDEO_SLIDES;
+  if (!Array.isArray(content.homeVideoSlides)) return [];
+  return content.homeVideoSlides
+    .map((item) => ({
+      title: item.title?.trim() ?? "",
+      subtitle: item.subtitle?.trim() ?? "",
+      videoSrc: item.videoSrc?.trim() ?? "",
+    }))
+    .filter((item) => item.videoSrc);
 }
 
 export function resolveFounderFields(content: SiteContent | null): FounderContent {

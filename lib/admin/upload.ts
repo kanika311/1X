@@ -6,6 +6,14 @@ const API = process.env.NEXT_PUBLIC_API_URL || "/api";
 export type MediaItem = { filename: string; url: string; path?: string; createdAt: string; size: number };
 
 export async function uploadImageFile(file: File): Promise<string> {
+  return uploadMediaFile(file);
+}
+
+export async function uploadVideoFile(file: File): Promise<string> {
+  return uploadMediaFile(file);
+}
+
+async function uploadMediaFile(file: File): Promise<string> {
   const form = new FormData();
   form.append("file", file);
   const token = getToken();
