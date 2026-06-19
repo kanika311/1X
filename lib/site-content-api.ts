@@ -58,9 +58,9 @@ export type SiteContent = {
 };
 
 export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
-  { mediaType: "image", src: "/cyber.png", alt: "Cybersecurity" },
-  { mediaType: "image", src: IMG.about, alt: "Wellness studio" },
   { mediaType: "image", src: "/LOGO.jpeg", alt: "1X" },
+  { mediaType: "image", src: "/cybersecurity.jpeg", alt: "Cybersecurity" },
+  { mediaType: "image", src: IMG.about, alt: "Wellness studio" },
 ];
 
 export const DEFAULT_VIDEO_SLIDES: VideoSliderItem[] = [
