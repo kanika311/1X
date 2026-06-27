@@ -161,10 +161,27 @@ function hashResetToken(token) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-function getFrontendUrl() {
+function getFrontendUrl(req) {
+  // Prefer the actual origin the request came from so reset links always point
+  // at the live domain (https://1xdrayxh.com) in prod and localhost in dev —
+  // without depending on a (possibly stale) FRONTEND_URL env var.
+  if (req) {
+    const origin = req.get?.("origin");
+    if (origin && /^https?:\/\//i.test(origin)) {
+      return origin.replace(/\/$/, "");
+    }
+    const host = req.get?.("x-forwarded-host") || req.get?.("host");
+    if (host) {
+      const proto = (req.get?.("x-forwarded-proto") || req.protocol || "https")
+        .split(",")[0]
+        .trim();
+      return `${proto}://${host}`.replace(/\/$/, "");
+    }
+  }
+
   const raw =
-    process.env.FRONTEND_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.FRONTEND_URL ||
     (process.env.ADMIN_APP_URL || "").replace(/\/admin\/?$/, "") ||
     "http://localhost:3000";
   return String(raw).replace(/\/$/, "");
@@ -200,7 +217,7 @@ export async function forgotPassword(req, res) {
   user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
   await user.save();
 
-  const resetUrl = `${getFrontendUrl()}/admin/reset-password?token=${rawToken}`;
+  const resetUrl = `${getFrontendUrl(req)}/admin/reset-password?token=${rawToken}`;
 
   try {
     await sendPasswordResetEmail({
@@ -281,7 +298,7 @@ export async function userForgotPassword(req, res) {
   user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
   await user.save();
 
-  const resetUrl = `${getFrontendUrl()}/reset-password?token=${rawToken}`;
+  const resetUrl = `${getFrontendUrl(req)}/reset-password?token=${rawToken}`;
 
   try {
     await sendPasswordResetEmail({ to: email, name: user.name, resetUrl });
