@@ -180,7 +180,7 @@ export function UpiPaymentFlow({
   useEffect(() => {
     if (!session) return;
     setName((n) => n || session.name);
-    setPhone((p) => p || session.number);
+    setPhone((p) => p || session.number || "");
   }, [session]);
 
   useEffect(() => {

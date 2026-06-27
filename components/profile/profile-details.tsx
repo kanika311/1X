@@ -60,7 +60,7 @@ export function ProfileDetails() {
   if (!session) return null;
 
   const displayName = session.name?.trim() || "Member";
-  const phone = session.number ?? "—";
+  const phone = session.number?.trim() ? session.number : "—";
   const currentEmail = session.email?.trim() || "";
 
   async function saveEmail(e: React.FormEvent) {

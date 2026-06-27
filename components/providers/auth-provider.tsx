@@ -15,7 +15,7 @@ import { decodeReferralCode, getStoredReferralCode } from "@/lib/referral";
 
 export type AuthSession = null | {
   type: "user";
-  number: string;
+  number?: string;
   name: string;
   email?: string;
   token: string;
@@ -24,7 +24,7 @@ export type AuthSession = null | {
 type AuthContextValue = {
   session: AuthSession;
   isReady: boolean;
-  login: (number: string, password: string) => Promise<string | null>;
+  login: (identifier: string, password: string) => Promise<string | null>;
   signup: (
     name: string,
     number: string,
@@ -49,13 +49,9 @@ function loadStoredSession(): AuthSession {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as AuthSession & { email?: string };
-    const number =
-      parsed?.type === "user" && parsed.number
-        ? normalizeStoredNumber(parsed.number)
-        : parsed?.email
-          ? normalizeStoredNumber(parsed.email)
-          : "";
-    if (parsed?.type === "user" && parsed.token && number) {
+    const number = parsed?.number ? normalizeStoredNumber(parsed.number) : "";
+    // A session is valid if it has a token and at least one identifier (phone or email).
+    if (parsed?.type === "user" && parsed.token && (number || parsed.email)) {
       setAuthToken(parsed.token);
       return { type: "user", number, name: parsed.name, email: parsed.email, token: parsed.token };
     }
@@ -88,17 +84,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(
-    async (number: string, password: string): Promise<string | null> => {
+    async (identifier: string, password: string): Promise<string | null> => {
       try {
-        const digits = normalizeStoredNumber(number.trim());
+        const trimmed = identifier.trim();
+        const digits = normalizeStoredNumber(trimmed);
         const data = await apiRequest<{
           token: string;
           user: { name: string; number?: string; email?: string };
         }>("/auth/login", {
           method: "POST",
-          body: JSON.stringify({ number: digits, password }),
+          body: JSON.stringify({ identifier: trimmed, number: digits, password }),
         });
-        const userNumber = data.user.number ? normalizeStoredNumber(data.user.number) : digits;
+        const userNumber = data.user.number ? normalizeStoredNumber(data.user.number) : "";
         persist({
           type: "user",
           number: userNumber,

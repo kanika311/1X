@@ -56,6 +56,10 @@ function AuthPanelForm() {
     e.preventDefault();
     setError("");
     if (!password.trim()) return;
+    if (mode === "signup" && !phone.trim() && !email.trim()) {
+      setError("Phone number ya email mein se kam se kam ek zaroori hai.");
+      return;
+    }
     setSubmitting(true);
     const err =
       mode === "login"
@@ -158,7 +162,7 @@ function AuthPanelForm() {
                   <Input
                     type="email"
                     autoComplete="email"
-                    placeholder="Email (for password reset)"
+                    placeholder="Email (phone ke bina bhi chalega)"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -166,15 +170,14 @@ function AuthPanelForm() {
               ) : null}
             </AnimatePresence>
             <Input
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel"
-              placeholder="Phone number (10 digits)"
+              type={mode === "login" ? "text" : "tel"}
+              inputMode={mode === "login" ? "text" : "numeric"}
+              autoComplete={mode === "login" ? "username" : "tel"}
+              placeholder={mode === "login" ? "Phone number or email" : "Phone number (optional)"}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              required
-              minLength={10}
-              maxLength={15}
+              required={mode === "login"}
+              maxLength={mode === "login" ? 60 : 15}
             />
             <div className="relative">
               <Input

@@ -32,29 +32,33 @@ async function findUsersByLoginId(loginId) {
 export async function register(req, res) {
   const { name, number, password, role } = req.body;
 
-  const normalizedNumber = normalizePhone(number);
-
-  if (!normalizedNumber) {
-    throw new ApiError(400, "Enter a valid 10-digit phone number");
-  }
-
-  if (await User.findOne({ number: normalizedNumber })) {
-    throw new ApiError(409, "Phone number already registered");
-  }
-
   if (role === "admin") {
     throw new ApiError(403, "Admin accounts can only be created from the admin dashboard");
   }
 
+  // Phone is optional — a member can sign up with just an email instead.
+  const hasNumberInput = Boolean(String(number ?? "").trim());
+  const normalizedNumber = hasNumberInput ? normalizePhone(number) : null;
+  if (hasNumberInput && !normalizedNumber) {
+    throw new ApiError(400, "Enter a valid phone number");
+  }
+
   const email = String(req.body.email || "").trim().toLowerCase();
-  if (email) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      throw new ApiError(400, "Enter a valid email address");
-    }
-    // Email only needs to be unique within the user role — admins can share the same email.
-    if (await User.findOne({ email, role: "user" })) {
-      throw new ApiError(409, "Email already registered");
-    }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new ApiError(400, "Enter a valid email address");
+  }
+
+  if (!normalizedNumber && !email) {
+    throw new ApiError(400, "Enter a phone number or email to sign up");
+  }
+
+  if (normalizedNumber && (await User.findOne({ number: normalizedNumber }))) {
+    throw new ApiError(409, "Phone number already registered");
+  }
+
+  // Email only needs to be unique within the user role — admins can share the same email.
+  if (email && (await User.findOne({ email, role: "user" }))) {
+    throw new ApiError(409, "Email already registered");
   }
 
   let referredBy;
@@ -69,9 +73,9 @@ export async function register(req, res) {
 
   const user = await User.create({
     name,
-    number: normalizedNumber,
     password,
     role: "user",
+    ...(normalizedNumber ? { number: normalizedNumber } : {}),
     ...(email ? { email } : {}),
     ...(referredBy ? { referredBy } : {}),
   });
