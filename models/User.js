@@ -6,7 +6,8 @@ import { registerModel } from "@/lib/db/register-model.js";
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
-    email: { type: String, sparse: true, unique: true, trim: true, lowercase: true },
+    // Email is unique per role (same email can exist once as admin and once as user)
+    email: { type: String, trim: true, lowercase: true },
     number: { type: String, sparse: true, unique: true, trim: true },
   
     password: { type: String, required: true, minlength: 6, select: false },
@@ -17,6 +18,12 @@ const userSchema = new mongoose.Schema(
     resetPasswordExpires: { type: Date, select: false },
   },
   { timestamps: true },
+);
+
+// Unique email per role — only enforced when email is a non-empty string.
+userSchema.index(
+  { email: 1, role: 1 },
+  { unique: true, partialFilterExpression: { email: { $type: "string" } } },
 );
 
 userSchema.pre("save", async function hashPassword() {

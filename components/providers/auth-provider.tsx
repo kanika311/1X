@@ -17,6 +17,7 @@ export type AuthSession = null | {
   type: "user";
   number: string;
   name: string;
+  email?: string;
   token: string;
 };
 
@@ -24,7 +25,13 @@ type AuthContextValue = {
   session: AuthSession;
   isReady: boolean;
   login: (number: string, password: string) => Promise<string | null>;
-  signup: (name: string, number: string, password: string) => Promise<string | null>;
+  signup: (
+    name: string,
+    number: string,
+    password: string,
+    email?: string,
+  ) => Promise<string | null>;
+  updateProfile: (fields: { name?: string; email?: string }) => Promise<string | null>;
   logout: () => void;
 };
 
@@ -50,7 +57,7 @@ function loadStoredSession(): AuthSession {
           : "";
     if (parsed?.type === "user" && parsed.token && number) {
       setAuthToken(parsed.token);
-      return { type: "user", number, name: parsed.name, token: parsed.token };
+      return { type: "user", number, name: parsed.name, email: parsed.email, token: parsed.token };
     }
   } catch {
     /* ignore */
@@ -86,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const digits = normalizeStoredNumber(number.trim());
         const data = await apiRequest<{
           token: string;
-          user: { name: string; number?: string };
+          user: { name: string; number?: string; email?: string };
         }>("/auth/login", {
           method: "POST",
           body: JSON.stringify({ number: digits, password }),
@@ -96,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           type: "user",
           number: userNumber,
           name: data.user.name,
+          email: data.user.email,
           token: data.token,
         });
         return null;
@@ -107,14 +115,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signup = useCallback(
-    async (name: string, number: string, password: string): Promise<string | null> => {
+    async (
+      name: string,
+      number: string,
+      password: string,
+      email?: string,
+    ): Promise<string | null> => {
       try {
         const digits = normalizeStoredNumber(number.trim());
         const refCode = getStoredReferralCode();
         const referredBy = refCode ? decodeReferralCode(refCode) : null;
+        const trimmedEmail = email?.trim();
         const data = await apiRequest<{
           token: string;
-          user: { name: string; number?: string };
+          user: { name: string; number?: string; email?: string };
         }>("/auth/register", {
           method: "POST",
           body: JSON.stringify({
@@ -122,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             number: digits,
             password,
             role: "user",
+            ...(trimmedEmail ? { email: trimmedEmail } : {}),
             ...(referredBy ? { referredBy } : {}),
           }),
         });
@@ -130,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           type: "user",
           number: userNumber,
           name: data.user.name,
+          email: data.user.email,
           token: data.token,
         });
         return null;
@@ -140,11 +156,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [persist],
   );
 
+  const updateProfile = useCallback(
+    async (fields: { name?: string; email?: string }): Promise<string | null> => {
+      try {
+        const data = await apiRequest<{
+          user: { name: string; number?: string; email?: string };
+        }>("/auth/me", {
+          method: "PUT",
+          auth: true,
+          body: JSON.stringify(fields),
+        });
+        setSession((prev) =>
+          prev?.type === "user"
+            ? (() => {
+                const next: AuthSession = {
+                  ...prev,
+                  name: data.user.name,
+                  email: data.user.email,
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+                return next;
+              })()
+            : prev,
+        );
+        return null;
+      } catch (e) {
+        return e instanceof Error ? e.message : "Could not update profile";
+      }
+    },
+    [],
+  );
+
   const logout = useCallback(() => persist(null), [persist]);
 
   const value = useMemo(
-    () => ({ session, isReady, login, signup, logout }),
-    [session, isReady, login, signup, logout],
+    () => ({ session, isReady, login, signup, updateProfile, logout }),
+    [session, isReady, login, signup, updateProfile, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

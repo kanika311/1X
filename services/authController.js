@@ -15,17 +15,18 @@ function userDto(user) {
   };
 }
 
-async function findUserByLoginId(loginId) {
+async function findUsersByLoginId(loginId) {
   const trimmed = String(loginId || "").trim();
-  if (!trimmed) return null;
+  if (!trimmed) return [];
 
   if (trimmed.includes("@")) {
-    return User.findOne({ email: trimmed.toLowerCase() }).select("+password");
+    // Email can now belong to both an admin and a user account.
+    return User.find({ email: trimmed.toLowerCase() }).select("+password");
   }
 
   const normalizedNumber = normalizePhone(trimmed);
-  if (!normalizedNumber) return null;
-  return User.findOne({ number: normalizedNumber }).select("+password");
+  if (!normalizedNumber) return [];
+  return User.find({ number: normalizedNumber }).select("+password");
 }
 
 export async function register(req, res) {
@@ -45,6 +46,17 @@ export async function register(req, res) {
     throw new ApiError(403, "Admin accounts can only be created from the admin dashboard");
   }
 
+  const email = String(req.body.email || "").trim().toLowerCase();
+  if (email) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new ApiError(400, "Enter a valid email address");
+    }
+    // Email only needs to be unique within the user role — admins can share the same email.
+    if (await User.findOne({ email, role: "user" })) {
+      throw new ApiError(409, "Email already registered");
+    }
+  }
+
   let referredBy;
 
   if (req.body.referredBy) {
@@ -60,6 +72,7 @@ export async function register(req, res) {
     number: normalizedNumber,
     password,
     role: "user",
+    ...(email ? { email } : {}),
     ...(referredBy ? { referredBy } : {}),
   });
 
@@ -77,9 +90,18 @@ export async function login(req, res) {
   const { number, identifier, password } = req.body;
   const loginId = identifier || number;
 
-  const user = await findUserByLoginId(loginId);
+  const candidates = await findUsersByLoginId(loginId);
 
-  if (!user || !(await user.comparePassword(password))) {
+  // An email may match both an admin and a user account — sign in whichever password matches.
+  let user = null;
+  for (const candidate of candidates) {
+    if (await candidate.comparePassword(password)) {
+      user = candidate;
+      break;
+    }
+  }
+
+  if (!user) {
     throw new ApiError(401, "Invalid email, phone, or password");
   }
 
@@ -95,6 +117,43 @@ export async function me(req, res) {
   res.json({
     success: true,
     user: userDto(req.user),
+  });
+}
+
+/** Update the signed-in member's name / email (email enables password reset). */
+export async function updateProfile(req, res) {
+  if (!req.user) throw new ApiError(401, "Not authorized");
+
+  const user = await User.findById(req.user._id ?? req.user.id);
+  if (!user) throw new ApiError(404, "Account not found");
+
+  if (req.body.name !== undefined) {
+    const name = String(req.body.name).trim();
+    if (!name) throw new ApiError(400, "Name cannot be empty");
+    user.name = name;
+  }
+
+  if (req.body.email !== undefined) {
+    const email = String(req.body.email).trim().toLowerCase();
+    if (email) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new ApiError(400, "Enter a valid email address");
+      }
+      const existing = await User.findOne({ email, role: user.role, _id: { $ne: user._id } });
+      if (existing) {
+        throw new ApiError(409, "Email already in use by another account");
+      }
+      user.email = email;
+    } else {
+      user.email = undefined;
+    }
+  }
+
+  await user.save();
+
+  res.json({
+    success: true,
+    user: userDto(user),
   });
 }
 
@@ -178,6 +237,83 @@ export async function resetPassword(req, res) {
     resetPasswordToken: hashResetToken(token),
     resetPasswordExpires: { $gt: new Date() },
     role: "admin",
+  }).select("+password +resetPasswordToken +resetPasswordExpires");
+
+  if (!user) {
+    throw new ApiError(400, "Reset link is invalid or has expired");
+  }
+
+  user.password = password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.json({
+    success: true,
+    message: "Password updated. You can sign in now.",
+  });
+}
+
+/** Member (user) forgot password — emails a reset link to the website /reset-password page. */
+export async function userForgotPassword(req, res) {
+  const email = String(req.body.email || "")
+    .trim()
+    .toLowerCase();
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new ApiError(400, "Enter a valid email address");
+  }
+
+  const successMessage = "If that email is registered, a reset link has been sent.";
+  const user = await User.findOne({ email, role: "user" });
+
+  if (!user) {
+    return res.json({ success: true, message: successMessage });
+  }
+
+  if (!isEmailConfigured()) {
+    console.error("[user-forgot-password] EMAIL_USER and EMAIL_PASS are not configured");
+    throw new ApiError(500, "Email service is not configured. Please contact support.");
+  }
+
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  user.resetPasswordToken = hashResetToken(rawToken);
+  user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
+  await user.save();
+
+  const resetUrl = `${getFrontendUrl()}/reset-password?token=${rawToken}`;
+
+  try {
+    await sendPasswordResetEmail({ to: email, name: user.name, resetUrl });
+    console.info("[user-forgot-password] Reset email queued", { email });
+    res.json({ success: true, message: successMessage });
+  } catch (err) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[user-forgot-password] Failed to send reset email", { email, error: detail });
+    throw new ApiError(500, "Could not send reset email. Please try again later.");
+  }
+}
+
+/** Member (user) reset password using the emailed token. */
+export async function userResetPassword(req, res) {
+  const token = String(req.body.token || "").trim();
+  const password = String(req.body.password || "");
+
+  if (!token) {
+    throw new ApiError(400, "Reset token is required");
+  }
+  if (!password || password.length < 6) {
+    throw new ApiError(400, "Password must be at least 6 characters");
+  }
+
+  const user = await User.findOne({
+    resetPasswordToken: hashResetToken(token),
+    resetPasswordExpires: { $gt: new Date() },
+    role: "user",
   }).select("+password +resetPasswordToken +resetPasswordExpires");
 
   if (!user) {

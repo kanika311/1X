@@ -38,6 +38,16 @@ function getEmailPass(): string {
   return pass;
 }
 
+/** Display name for the From header (address itself is always the authenticated account). */
+function getFromDisplayName(): string {
+  const raw = process.env.EMAIL_FROM?.trim();
+  if (raw) {
+    const match = raw.match(/^"?([^"<]+?)"?\s*</);
+    if (match?.[1]?.trim()) return match[1].trim();
+  }
+  return "1X · Dr. Ayxh";
+}
+
 /** Gmail SMTP transporter (App Password authentication). */
 export function getMailTransporter(): nodemailer.Transporter<SMTPTransport.SentMessageInfo> {
   if (cachedTransporter) return cachedTransporter;
@@ -122,7 +132,12 @@ export async function sendPasswordResetEmail({
 
   const transporter = getMailTransporter();
   const { subject, text, html } = buildPasswordResetEmailContent({ name, resetUrl });
-  const from = process.env.EMAIL_FROM?.trim() || `"1X Admin" <${getEmailUser()}>`;
+
+  // Always send From the authenticated Gmail account so DKIM/SPF/DMARC align
+  // (a mismatched From address is the #1 reason Gmail flags mail as spam).
+  const authUser = getEmailUser();
+  const displayName = getFromDisplayName();
+  const from = `"${displayName}" <${authUser}>`;
 
   try {
     await transporter.verify();
@@ -133,7 +148,20 @@ export async function sendPasswordResetEmail({
   }
 
   try {
-    const info = await transporter.sendMail({ from, to, subject, text, html });
+    const info = await transporter.sendMail({
+      from,
+      to,
+      subject,
+      text,
+      html,
+      replyTo: authUser,
+      envelope: { from: authUser, to },
+      headers: {
+        "X-Entity-Ref-ID": `pwd-reset-${Date.now()}`,
+        "List-Unsubscribe": `<mailto:${authUser}>`,
+        "Auto-Submitted": "auto-generated",
+      },
+    });
     console.info("[email] Password reset email sent", { to, messageId: info.messageId });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

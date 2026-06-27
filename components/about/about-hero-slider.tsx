@@ -42,7 +42,7 @@ function SlideMedia({ slide, mediaSrc }: { slide: HeroSlide; mediaSrc: string })
           playsInline
         />
         <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-rose-50/30 via-transparent to-peach-100/25 backdrop-blur-[1px]"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-rose-50/10"
           aria-hidden
         />
       </>
@@ -50,16 +50,24 @@ function SlideMedia({ slide, mediaSrc }: { slide: HeroSlide; mediaSrc: string })
   }
 
   return (
-    <SoftImage
-      src={mediaSrc}
-      alt={slide.alt || "Home hero slide"}
-      overlay="hero"
-      rounded="none"
-      priority
-      sizes="100vw"
-      fallbackChain={HERO_IMAGE_FALLBACKS}
-      imageClassName="object-cover object-center"
-    />
+    <>
+      <SoftImage
+        src={mediaSrc}
+        alt={slide.alt || "Home hero slide"}
+        overlay="none"
+        rounded="none"
+        priority
+        sizes="100vw"
+        fallbackChain={HERO_IMAGE_FALLBACKS}
+        className="absolute inset-0 h-full w-full"
+        imageClassName="object-cover object-center !min-h-full !min-w-full !scale-[1.12] sm:!scale-[1.06] blur-[2px] sm:blur-[3px]"
+      />
+      {/* Soft dreamy pink wash — full bleed (even on mobile) */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-rose-50/55 via-rose-50/30 to-peach-100/45 backdrop-blur-[2px]"
+        aria-hidden
+      />
+    </>
   );
 }
 
@@ -124,7 +132,7 @@ export function AboutHeroSlider({ initialSlides }: AboutHeroSliderProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={slideTransition}
-            className="absolute inset-0"
+            className="absolute inset-0 overflow-hidden"
           >
             <SlideMedia slide={slide} mediaSrc={mediaSrc} />
           </motion.div>
@@ -164,7 +172,7 @@ export function AboutHeroSlider({ initialSlides }: AboutHeroSliderProps) {
           </>
         ) : null}
 
-        <div className="relative z-10 mx-auto flex h-full max-w-4xl flex-col items-center justify-end px-4 pb-14 pt-16 text-center sm:px-6 sm:pb-16">
+        <div className="pointer-events-none absolute inset-0 z-10 flex h-full flex-col items-center justify-end px-4 pb-14 pt-16 text-center sm:px-6 sm:pb-16">
           <p className="eyebrow text-white/95">Our story</p>
           <h1 className="mt-3 text-4xl text-white drop-shadow-sm md:text-5xl lg:text-6xl">Dr. Ayxh</h1>
           <p className="mt-2 text-sm font-medium uppercase tracking-[0.2em] text-white/90">Founder · 1X</p>

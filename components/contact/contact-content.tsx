@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FiCheck, FiLinkedin, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
+import { FiCheck, FiLinkedin, FiMail, FiMapPin, FiPhone, FiX } from "react-icons/fi";
+import { RiWhatsappLine } from "react-icons/ri";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ export function ContactContent({ initialContent = null }: ContactContentProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   useEffect(() => {
     fetch(`${API}/site-content`, { cache: "no-store" })
@@ -31,11 +33,19 @@ export function ContactContent({ initialContent = null }: ContactContentProps) {
       .catch(() => {});
   }, []);
 
-  const { headline, subheadline, address, email: contactEmail, phone: contactPhone, linkedin } =
-    resolveContactFields(content);
+  const {
+    headline,
+    subheadline,
+    address,
+    email: contactEmail,
+    phone: contactPhone,
+    whatsapp,
+    linkedin,
+  } = resolveContactFields(content);
 
   const phoneDigits = contactPhone.replace(/[^\d+]/g, "");
   const telHref = phoneDigits ? `tel:${phoneDigits}` : "#";
+  const whatsappDigits = (whatsapp || contactPhone).replace(/\D/g, "");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -130,7 +140,7 @@ export function ContactContent({ initialContent = null }: ContactContentProps) {
             <p className={subheadline ? "mt-3 text-sm text-muted" : "text-sm text-muted"}>
               Slots: Mon–Sat, 7 AM – 7 PM IST
             </p>
-            <Button variant="luxury" className="mt-6">
+            <Button variant="luxury" className="mt-6" onClick={() => setBookingOpen(true)}>
               Request booking
             </Button>
           </div>
@@ -162,6 +172,154 @@ export function ContactContent({ initialContent = null }: ContactContentProps) {
             ) : null}
           </ul>
         </div>
+      </div>
+
+      {bookingOpen ? (
+        <BookingModal whatsappDigits={whatsappDigits} onClose={() => setBookingOpen(false)} />
+      ) : null}
+    </div>
+  );
+}
+
+type BookingModalProps = {
+  whatsappDigits: string;
+  onClose: () => void;
+};
+
+function BookingModal({ whatsappDigits, onClose }: BookingModalProps) {
+  const [bName, setBName] = useState("");
+  const [bPhone, setBPhone] = useState("");
+  const [bService, setBService] = useState("Physiotherapy");
+  const [bDate, setBDate] = useState("");
+  const [bTime, setBTime] = useState("");
+  const [bNotes, setBNotes] = useState("");
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  function handleBookingSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    const lines = [
+      "Hi Dr. Ayxh, I would like to request a booking:",
+      "",
+      `Name: ${bName.trim() || "-"}`,
+      `Phone: ${bPhone.trim() || "-"}`,
+      `Service: ${bService}`,
+      `Preferred date: ${bDate || "-"}`,
+      `Preferred time: ${bTime || "-"}`,
+    ];
+    if (bNotes.trim()) {
+      lines.push(`Notes: ${bNotes.trim()}`);
+    }
+
+    const text = encodeURIComponent(lines.join("\n"));
+    const url = whatsappDigits
+      ? `https://wa.me/${whatsappDigits}?text=${text}`
+      : `https://wa.me/?text=${text}`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
+    onClose();
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/55 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md overflow-hidden rounded-2xl border border-rose-100 bg-white shadow-glow"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative bg-gradient-to-r from-mauve-deep via-mauve to-rose-400 px-5 py-4 pr-12 text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full border border-white/25 bg-white/10 transition hover:bg-white/20"
+            aria-label="Close"
+          >
+            <FiX />
+          </button>
+          <p className="text-[10px] uppercase tracking-wider text-rose-100/90">Request booking</p>
+          <h3 className="text-xl">Book your session</h3>
+        </div>
+
+        <form className="space-y-4 px-5 py-5" onSubmit={handleBookingSubmit}>
+          <Input
+            name="bookingName"
+            placeholder="Full name"
+            value={bName}
+            onChange={(e) => setBName(e.target.value)}
+            required
+          />
+          <Input
+            name="bookingPhone"
+            type="tel"
+            placeholder="Phone number"
+            value={bPhone}
+            onChange={(e) => setBPhone(e.target.value)}
+            required
+          />
+          <div>
+            <label className="text-xs font-semibold uppercase text-muted">Service</label>
+            <select
+              value={bService}
+              onChange={(e) => setBService(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-ink/15 bg-white px-4 py-3 text-base text-ink outline-none focus-visible:ring-2 focus-visible:ring-rose-200/80"
+            >
+              <option>Physiotherapy</option>
+              <option>Cybersecurity course</option>
+              <option>Consultation</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold uppercase text-muted">Date</label>
+              <Input
+                name="bookingDate"
+                type="date"
+                value={bDate}
+                onChange={(e) => setBDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase text-muted">Time</label>
+              <Input
+                name="bookingTime"
+                type="time"
+                value={bTime}
+                onChange={(e) => setBTime(e.target.value)}
+              />
+            </div>
+          </div>
+          <textarea
+            name="bookingNotes"
+            rows={3}
+            placeholder="Anything we should know? (optional)"
+            value={bNotes}
+            onChange={(e) => setBNotes(e.target.value)}
+            className="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 text-base text-ink outline-none placeholder:text-subtle focus-visible:ring-2 focus-visible:ring-rose-200/80"
+          />
+          <Button type="submit" className="w-full gap-2">
+            <RiWhatsappLine className="size-5" />
+            Send on WhatsApp
+          </Button>
+          <p className="text-center text-xs text-subtle">
+            Opens WhatsApp with your booking details prefilled.
+          </p>
+        </form>
       </div>
     </div>
   );

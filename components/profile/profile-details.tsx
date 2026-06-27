@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
+  FiCheck,
   FiHeart,
   FiLogOut,
+  FiMail,
   FiPackage,
   FiPhone,
   FiShoppingBag,
@@ -13,6 +15,7 @@ import {
 import { ProfileOrders } from "@/components/profile/profile-orders";
 import { useAuth } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { fetchMyOrders, type UserOrder } from "@/lib/orders-api";
 import { formatPrice } from "@/lib/utils";
 
@@ -36,9 +39,15 @@ const quickLinks = [
 ] as const;
 
 export function ProfileDetails() {
-  const { session, logout } = useAuth();
+  const { session, logout, updateProfile } = useAuth();
   const [orders, setOrders] = useState<UserOrder[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const [emailSaving, setEmailSaving] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [emailSaved, setEmailSaved] = useState(false);
 
   useEffect(() => {
     fetchMyOrders()
@@ -52,6 +61,29 @@ export function ProfileDetails() {
 
   const displayName = session.name?.trim() || "Member";
   const phone = session.number ?? "—";
+  const currentEmail = session.email?.trim() || "";
+
+  async function saveEmail(e: React.FormEvent) {
+    e.preventDefault();
+    setEmailError("");
+    setEmailSaved(false);
+    setEmailSaving(true);
+    const err = await updateProfile({ email: emailInput.trim() });
+    setEmailSaving(false);
+    if (err) {
+      setEmailError(err);
+      return;
+    }
+    setEmailSaved(true);
+    setEditingEmail(false);
+  }
+
+  function startEditingEmail() {
+    setEmailInput(currentEmail);
+    setEmailError("");
+    setEmailSaved(false);
+    setEditingEmail(true);
+  }
 
   return (
     <div className="w-full space-y-5">
@@ -69,10 +101,18 @@ export function ProfileDetails() {
               <h1 className="mt-1 truncate font-[family-name:var(--font-cormorant)] text-3xl leading-tight text-ink sm:text-4xl">
                 {displayName}
               </h1>
-              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-white/70 px-3 py-1 text-sm text-muted">
-                <FiPhone className="size-3.5 text-mauve" />
-                {phone}
-              </span>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-white/70 px-3 py-1 text-sm text-muted">
+                  <FiPhone className="size-3.5 text-mauve" />
+                  {phone}
+                </span>
+                {currentEmail ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-white/70 px-3 py-1 text-sm text-muted">
+                    <FiMail className="size-3.5 text-mauve" />
+                    {currentEmail}
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -104,6 +144,58 @@ export function ProfileDetails() {
               {loading ? "—" : formatPrice(stats.totalSpent)}
             </p>
           </div>
+        </div>
+
+        <div className="relative mt-4 rounded-2xl border border-white/80 bg-white/60 px-4 py-3.5 backdrop-blur-sm">
+          {editingEmail ? (
+            <form onSubmit={saveEmail} className="space-y-3">
+              <label className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                {currentEmail ? "Update email" : "Add email (for password reset)"}
+              </label>
+              <Input
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                required
+              />
+              {emailError ? <p className="text-sm text-red-500">{emailError}</p> : null}
+              <div className="flex gap-2">
+                <Button type="submit" size="sm" disabled={emailSaving}>
+                  {emailSaving ? "Saving…" : "Save email"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditingEmail(false)}
+                  disabled={emailSaving}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Email</p>
+                {currentEmail ? (
+                  <p className="mt-0.5 flex items-center gap-1.5 truncate text-sm text-ink">
+                    {currentEmail}
+                    {emailSaved ? <FiCheck className="size-3.5 text-emerald-600" /> : null}
+                  </p>
+                ) : (
+                  <p className="mt-0.5 text-sm text-muted">
+                    Add an email so you can reset your password if you forget it.
+                  </p>
+                )}
+              </div>
+              <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={startEditingEmail}>
+                {currentEmail ? "Edit" : "Add email"}
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
