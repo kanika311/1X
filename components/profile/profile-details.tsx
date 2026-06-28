@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
+  FiAlertTriangle,
   FiCheck,
   FiHeart,
   FiLogOut,
@@ -39,7 +41,8 @@ const quickLinks = [
 ] as const;
 
 export function ProfileDetails() {
-  const { session, logout, updateProfile } = useAuth();
+  const { session, logout, updateProfile, deactivateAccount } = useAuth();
+  const router = useRouter();
   const [orders, setOrders] = useState<UserOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,6 +51,10 @@ export function ProfileDetails() {
   const [emailSaving, setEmailSaving] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [emailSaved, setEmailSaved] = useState(false);
+
+  const [confirmDeactivate, setConfirmDeactivate] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
+  const [deactivateError, setDeactivateError] = useState("");
 
   useEffect(() => {
     fetchMyOrders()
@@ -83,6 +90,19 @@ export function ProfileDetails() {
     setEmailError("");
     setEmailSaved(false);
     setEditingEmail(true);
+  }
+
+  async function handleDeactivate() {
+    setDeactivateError("");
+    setDeactivating(true);
+    const err = await deactivateAccount();
+    setDeactivating(false);
+    if (err) {
+      setDeactivateError(err);
+      return;
+    }
+    setConfirmDeactivate(false);
+    router.push("/");
   }
 
   return (
@@ -215,6 +235,70 @@ export function ProfileDetails() {
       </div>
 
       <ProfileOrders orders={orders} loading={loading} />
+
+      <section className="rounded-3xl border border-red-100 bg-red-50/40 p-5 sm:p-6">
+        <div className="flex items-start gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
+            <FiAlertTriangle className="size-4" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="font-semibold text-ink">Deactivate account</h2>
+            <p className="mt-1 text-sm text-muted">
+              Your account will be disabled and you won&apos;t be able to sign in. To reactivate it later,
+              you&apos;ll need to contact support.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-4 border-red-200 text-red-600 hover:bg-red-50"
+              onClick={() => {
+                setDeactivateError("");
+                setConfirmDeactivate(true);
+              }}
+            >
+              Deactivate my account
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {confirmDeactivate ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-glow">
+            <div className="flex items-center gap-3">
+              <span className="flex size-10 items-center justify-center rounded-full bg-red-100 text-red-600">
+                <FiAlertTriangle className="size-5" />
+              </span>
+              <h3 className="font-serif text-xl text-ink">Are you sure?</h3>
+            </div>
+            <p className="mt-3 text-sm text-muted">
+              This will deactivate your account and sign you out immediately. You won&apos;t be able to log
+              back in until support reactivates it.
+            </p>
+            {deactivateError ? <p className="mt-3 text-sm text-red-500">{deactivateError}</p> : null}
+            <div className="mt-5 flex gap-3">
+              <Button
+                type="button"
+                className="flex-1 bg-red-600 hover:bg-red-700"
+                onClick={handleDeactivate}
+                disabled={deactivating}
+              >
+                {deactivating ? "Deactivating…" : "Yes, deactivate"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => setConfirmDeactivate(false)}
+                disabled={deactivating}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

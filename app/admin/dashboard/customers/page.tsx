@@ -19,6 +19,7 @@ export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,6 +53,23 @@ export default function CustomersPage() {
     }
   }
 
+  async function toggleStatus(c: Customer) {
+    if (!c.id) return;
+    const nextActive = c.active === false;
+    setBusyId(c.id);
+    try {
+      await apiFetch(`/admin/customers/${c.id}/status`, {
+        method: "PATCH",
+        body: { active: nextActive },
+      });
+      setCustomers((prev) => prev.map((row) => (row.id === c.id ? { ...row, active: nextActive } : row)));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Could not update customer status");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <div>
       <h1 className="font-serif text-3xl text-ink">Customers</h1>
@@ -71,6 +89,7 @@ export default function CustomersPage() {
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Phone</th>
                 <th className="px-4 py-3">Type</th>
+                <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Orders</th>
                 <th className="px-4 py-3">Total spent</th>
                 <th className="px-4 py-3">Last order</th>
@@ -83,19 +102,55 @@ export default function CustomersPage() {
                   <td className="px-4 py-3 font-medium">{c.name}</td>
                   <td className="px-4 py-3">{c.number}</td>
                   <td className="px-4 py-3 capitalize">{c.source}</td>
+                  <td className="px-4 py-3">
+                    {c.source === "registered" ? (
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                          c.active === false
+                            ? "bg-red-100 text-red-700"
+                            : "bg-emerald-100 text-emerald-700"
+                        }`}
+                      >
+                        {c.active === false ? "Deactivated" : "Active"}
+                      </span>
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">{c.orderCount}</td>
                   <td className="px-4 py-3">₹{c.totalSpent.toLocaleString("en-IN")}</td>
                   <td className="px-4 py-3 text-muted">
                     {c.lastOrderAt ? new Date(c.lastOrderAt).toLocaleDateString() : "—"}
                   </td>
                   <td className="px-4 py-3">
-                    {c.orderCount > 0 ? (
-                      <Link href={ordersLink(c)} className="text-mauve-deep hover:underline">
-                        View orders
-                      </Link>
-                    ) : (
-                      <span className="text-muted">—</span>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {c.orderCount > 0 ? (
+                        <Link href={ordersLink(c)} className="text-mauve-deep hover:underline">
+                          View orders
+                        </Link>
+                      ) : null}
+                      {c.source === "registered" && c.id ? (
+                        <button
+                          type="button"
+                          onClick={() => toggleStatus(c)}
+                          disabled={busyId === c.id}
+                          className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                            c.active === false
+                              ? "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                              : "border-red-200 text-red-600 hover:bg-red-50"
+                          }`}
+                        >
+                          {busyId === c.id
+                            ? "…"
+                            : c.active === false
+                              ? "Activate"
+                              : "Deactivate"}
+                        </button>
+                      ) : null}
+                      {c.orderCount === 0 && !(c.source === "registered" && c.id) ? (
+                        <span className="text-muted">—</span>
+                      ) : null}
+                    </div>
                   </td>
                 </tr>
               ))}

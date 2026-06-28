@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema(
   
     password: { type: String, required: true, minlength: 6, select: false },
     role: { type: String, enum: ["user", "admin"], default: "user" },
+    /** When false the account is deactivated and cannot sign in */
+    active: { type: Boolean, default: true },
     /** Phone of member who referred this user (10-digit) */
     referredBy: { type: String, trim: true },
     resetPasswordToken: { type: String, select: false },

@@ -109,11 +109,28 @@ export async function login(req, res) {
     throw new ApiError(401, "Invalid email, phone, or password");
   }
 
+  if (user.active === false) {
+    throw new ApiError(403, "This account has been deactivated. Please contact support to reactivate it.");
+  }
+
   res.json({
     success: true,
     token: signToken(user._id),
     user: userDto(user),
   });
+}
+
+/** Member deactivates their own account — they will no longer be able to sign in. */
+export async function deactivateAccount(req, res) {
+  if (!req.user) throw new ApiError(401, "Not authorized");
+
+  const user = await User.findById(req.user._id ?? req.user.id);
+  if (!user) throw new ApiError(404, "Account not found");
+
+  user.active = false;
+  await user.save();
+
+  res.json({ success: true, message: "Your account has been deactivated." });
 }
 
 export async function me(req, res) {

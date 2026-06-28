@@ -48,6 +48,7 @@ function customerDto(fields) {
     lastOrderAt: fields.lastOrderAt ?? null,
     totalSpent: fields.totalSpent ?? 0,
     source: fields.source,
+    active: fields.active ?? true,
   };
 }
 
@@ -171,7 +172,7 @@ export async function listMyOrders(req, res) {
 
 export async function listCustomers(_req, res) {
   const users = await User.find({ role: "user" })
-    .select("name number email createdAt")
+    .select("name number email createdAt active")
     .sort({ createdAt: -1 })
     .lean();
 
@@ -231,6 +232,7 @@ export async function listCustomers(_req, res) {
         lastOrderAt: stats?.lastOrderAt ?? null,
         totalSpent: stats?.totalSpent ?? 0,
         source: "registered",
+        active: u.active !== false,
       });
     }),
   );
@@ -302,6 +304,26 @@ export async function repairCustomerPhones(_req, res) {
     fixed += 1;
   }
   res.json({ success: true, message: `Updated ${fixed} user phone(s)`, fixed });
+}
+
+/** Admin activates / deactivates a registered customer. A deactivated user cannot sign in. */
+export async function setCustomerStatus(req, res) {
+  const { id } = req.params;
+  const active = req.body.active === true || req.body.active === "true";
+
+  const user = await User.findById(id);
+  if (!user || user.role !== "user") {
+    throw new ApiError(404, "Customer not found");
+  }
+
+  user.active = active;
+  await user.save();
+
+  res.json({
+    success: true,
+    message: active ? "Customer activated." : "Customer deactivated.",
+    active,
+  });
 }
 
 export async function listOrders(req, res) {

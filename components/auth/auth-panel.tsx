@@ -57,7 +57,7 @@ function AuthPanelForm() {
     setError("");
     if (!password.trim()) return;
     if (mode === "signup" && !phone.trim() && !email.trim()) {
-      setError("Phone number ya email mein se kam se kam ek zaroori hai.");
+      setError("Enter either phone number or email.");
       return;
     }
     setSubmitting(true);
@@ -162,7 +162,7 @@ function AuthPanelForm() {
                   <Input
                     type="email"
                     autoComplete="email"
-                    placeholder="Email (phone ke bina bhi chalega)"
+                    placeholder="Email "
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />

@@ -32,6 +32,7 @@ type AuthContextValue = {
     email?: string,
   ) => Promise<string | null>;
   updateProfile: (fields: { name?: string; email?: string }) => Promise<string | null>;
+  deactivateAccount: () => Promise<string | null>;
   logout: () => void;
 };
 
@@ -186,9 +187,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => persist(null), [persist]);
 
+  const deactivateAccount = useCallback(async (): Promise<string | null> => {
+    try {
+      await apiRequest("/auth/deactivate", { method: "POST", auth: true });
+      persist(null);
+      return null;
+    } catch (e) {
+      return e instanceof Error ? e.message : "Could not deactivate account";
+    }
+  }, [persist]);
+
   const value = useMemo(
-    () => ({ session, isReady, login, signup, updateProfile, logout }),
-    [session, isReady, login, signup, updateProfile, logout],
+    () => ({ session, isReady, login, signup, updateProfile, deactivateAccount, logout }),
+    [session, isReady, login, signup, updateProfile, deactivateAccount, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

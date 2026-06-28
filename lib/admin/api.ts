@@ -99,6 +99,7 @@ export type Customer = {
   lastOrderAt: string | null;
   totalSpent: number;
   source: "registered" | "guest";
+  active?: boolean;
 };
 
 export type OrderItem = {
