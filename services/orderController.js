@@ -311,13 +311,12 @@ export async function setCustomerStatus(req, res) {
   const { id } = req.params;
   const active = req.body.active === true || req.body.active === "true";
 
-  const user = await User.findById(id);
+  const user = await User.findById(id).select("role");
   if (!user || user.role !== "user") {
     throw new ApiError(404, "Customer not found");
   }
 
-  user.active = active;
-  await user.save();
+  await User.updateOne({ _id: id }, { $set: { active } });
 
   res.json({
     success: true,

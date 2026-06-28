@@ -124,11 +124,14 @@ export async function login(req, res) {
 export async function deactivateAccount(req, res) {
   if (!req.user) throw new ApiError(401, "Not authorized");
 
-  const user = await User.findById(req.user._id ?? req.user.id);
-  if (!user) throw new ApiError(404, "Account not found");
-
-  user.active = false;
-  await user.save();
+  // Atomic update avoids loading the full doc (password is select:false and
+  // would otherwise fail required-field validation on save()).
+  const updated = await User.findByIdAndUpdate(
+    req.user._id ?? req.user.id,
+    { $set: { active: false } },
+    { new: true },
+  );
+  if (!updated) throw new ApiError(404, "Account not found");
 
   res.json({ success: true, message: "Your account has been deactivated." });
 }
