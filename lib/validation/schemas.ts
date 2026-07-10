@@ -1,13 +1,16 @@
 import { z } from "zod";
 
-const phoneOrEmail = z.string().trim().min(1, "Identifier is required");
-
-export const loginSchema = z.object({
-  identifier: phoneOrEmail.optional(),
-  number: z.string().trim().optional(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  scope: z.enum(["user", "admin"]).default("user"),
-});
+export const loginSchema = z
+  .object({
+    identifier: z.string().trim().optional(),
+    number: z.string().trim().optional(),
+    password: z.string().min(1, "Password is required"),
+    scope: z.enum(["user", "admin"]).default("user"),
+  })
+  .refine((data) => Boolean(data.identifier?.trim() || data.number?.trim()), {
+    message: "Email or phone is required",
+    path: ["identifier"],
+  });
 
 export const registerSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(120),
