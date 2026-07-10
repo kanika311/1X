@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import {
+  buildApiContentSecurityPolicy,
+  buildBaselineSecurityHeaders,
   buildContentSecurityPolicy,
   buildSecurityHeaders,
   generateNonce,
@@ -10,10 +12,9 @@ import {
 const ADMIN_PREFIX = "/admin";
 const ADMIN_API_PREFIX = "/api/admin";
 const isDev = process.env.NODE_ENV === "development";
+const isProduction = process.env.NODE_ENV === "production";
 
-function applySecurityHeaders(response: NextResponse, nonce: string) {
-  const csp = buildContentSecurityPolicy(nonce, isDev);
-  const headers = buildSecurityHeaders(csp);
+function applyHeaders(response: NextResponse, headers: Record<string, string>) {
   for (const [key, value] of Object.entries(headers)) {
     response.headers.set(key, value);
   }
@@ -34,13 +35,23 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith(ADMIN_API_PREFIX)) {
     const hasSession = Boolean(request.cookies.get("onex_at")?.value);
     if (!hasSession) {
-      return NextResponse.json({ success: false, message: "Not authorized" }, { status: 401 });
+      const apiResponse = NextResponse.json({ success: false, message: "Not authorized" }, { status: 401 });
+      applyHeaders(apiResponse, {
+        ...buildBaselineSecurityHeaders(isProduction),
+        "Content-Security-Policy": buildApiContentSecurityPolicy(),
+      });
+      return apiResponse;
     }
   }
 
-  // CSP nonces apply to HTML document routes only (not JSON API responses).
+  // API routes: baseline headers + minimal API CSP (no unsafe-inline).
   if (pathname.startsWith("/api")) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    applyHeaders(response, {
+      ...buildBaselineSecurityHeaders(isProduction),
+      "Content-Security-Policy": buildApiContentSecurityPolicy(),
+    });
+    return response;
   }
 
   const nonce = generateNonce();
@@ -54,7 +65,7 @@ export function middleware(request: NextRequest) {
     request: { headers: requestHeaders },
   });
 
-  applySecurityHeaders(response, nonce);
+  applyHeaders(response, buildSecurityHeaders(csp, isProduction));
   return response;
 }
 

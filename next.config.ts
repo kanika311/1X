@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { buildBaselineSecurityHeaders } from "./lib/security/csp";
+
 function buildRemotePatterns(): NonNullable<NextConfig["images"]>["remotePatterns"] {
   const patterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
     {
@@ -72,7 +74,19 @@ function buildRemotePatterns(): NonNullable<NextConfig["images"]>["remotePattern
   return patterns;
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const nextConfig: NextConfig = {
+  async headers() {
+    const baseline = buildBaselineSecurityHeaders(isProduction);
+    return [
+      {
+        source: "/(.*)",
+        headers: Object.entries(baseline).map(([key, value]) => ({ key, value })),
+      },
+    ];
+  },
+
   async redirects() {
     return [
       { source: "/offers", destination: "/gift-cards", permanent: true },

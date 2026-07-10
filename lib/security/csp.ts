@@ -35,15 +35,33 @@ export function buildContentSecurityPolicy(nonce: string, isDev: boolean): strin
   ].join("; ");
 }
 
-export function buildSecurityHeaders(csp: string): Record<string, string> {
-  return {
-    "Content-Security-Policy": csp,
+/** Minimal CSP for JSON API responses (no scripts). */
+export function buildApiContentSecurityPolicy(): string {
+  return ["default-src 'none'", "frame-ancestors 'none'", "base-uri 'none'"].join("; ");
+}
+
+/** Security headers without CSP — safe to set on every response via next.config. */
+export function buildBaselineSecurityHeaders(isProduction: boolean): Record<string, string> {
+  const headers: Record<string, string> = {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
     "X-DNS-Prefetch-Control": "off",
     "Cross-Origin-Resource-Policy": "same-origin",
-    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+    "X-Frame-Options": "DENY",
+  };
+
+  if (isProduction) {
+    headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
+  }
+
+  return headers;
+}
+
+export function buildSecurityHeaders(csp: string, isProduction = true): Record<string, string> {
+  return {
+    ...buildBaselineSecurityHeaders(isProduction),
+    "Content-Security-Policy": csp,
   };
 }
 
