@@ -7,11 +7,10 @@ import { createPortal } from "react-dom";
 import { FiCheck, FiCopy, FiGift, FiX } from "react-icons/fi";
 
 import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/lib/api-client";
 import {
-  buildSpinCouponCode,
   displaySegmentIndexForPercent,
   loadLastSpin,
-  pickSpinDiscount,
   saveLastSpin,
   SPIN_DISPLAY_PERCENTS,
   SPIN_DISPLAY_SEGMENT_COUNT,
@@ -122,23 +121,36 @@ export function SpinWheel() {
   const spin = useCallback(() => {
     if (spinning) return;
 
-    const percent = pickSpinDiscount();
-    const index = displaySegmentIndexForPercent(percent);
-    const segmentCenter = index * DEG_PER_SEGMENT + DEG_PER_SEGMENT / 2;
-    const extraTurns = 5 + Math.floor(Math.random() * 3);
-    const target = rotation + extraTurns * 360 + (360 - segmentCenter);
+    void (async () => {
+      let percent = 1;
+      let code = "";
+      try {
+        const data = await apiRequest<{
+          spin: { percent: number; code: string; at: string };
+        }>("/spin/issue", { method: "POST", auth: true });
+        percent = data.spin.percent;
+        code = data.spin.code;
+      } catch {
+        setSpinning(false);
+        return;
+      }
 
-    setSpinning(true);
-    setRotation(target);
+      const index = displaySegmentIndexForPercent(percent);
+      const segmentCenter = index * DEG_PER_SEGMENT + DEG_PER_SEGMENT / 2;
+      const extraTurns = 5 + Math.floor(Math.random() * 3);
+      const target = rotation + extraTurns * 360 + (360 - segmentCenter);
 
-    window.setTimeout(() => {
-      const code = buildSpinCouponCode(percent);
-      const stored: StoredSpin = { percent, code, at: new Date().toISOString() };
-      saveLastSpin(stored);
-      setWon(stored);
-      setSpinning(false);
-      setResultOpen(true);
-    }, 4200);
+      setSpinning(true);
+      setRotation(target);
+
+      window.setTimeout(() => {
+        const stored: StoredSpin = { percent, code, at: new Date().toISOString() };
+        saveLastSpin(stored);
+        setWon(stored);
+        setSpinning(false);
+        setResultOpen(true);
+      }, 4200);
+    })();
   }, [rotation, spinning]);
 
   const copyCode = async () => {

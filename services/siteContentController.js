@@ -1,4 +1,5 @@
 import { SiteContent } from "@/models/SiteContent.js";
+import { sanitizeLinkedInUrl, sanitizeMediaSrc } from "@/lib/server/safeUrl.js";
 
 function safeString(v) {
   return typeof v === "string" ? v : v == null ? "" : String(v);
@@ -25,7 +26,7 @@ function normalizeContact(contact) {
     email: safeString(contact.email),
     phone: safeString(contact.phone),
     whatsapp: safeString(contact.whatsapp),
-    linkedin: safeString(contact.linkedin),
+    linkedin: sanitizeLinkedInUrl(contact.linkedin),
   };
 }
 
@@ -44,7 +45,7 @@ function normalizePayment(payment) {
   return {
     upiId: safeString(payment.upiId),
     upiPayeeName: safeString(payment.upiPayeeName),
-    qrImage: safeString(payment.qrImage),
+    qrImage: sanitizeMediaSrc(payment.qrImage),
   };
 }
 
@@ -54,7 +55,7 @@ function normalizeFounder(founder) {
     eyebrow: safeString(founder.eyebrow),
     title: safeString(founder.title),
     body: safeString(founder.body),
-    image: safeString(founder.image),
+    image: sanitizeMediaSrc(founder.image),
   };
 }
 
@@ -63,7 +64,7 @@ function normalizeHeroSlides(slides) {
   return slides
     .map((slide) => ({
       mediaType: slide?.mediaType === "video" ? "video" : "image",
-      src: safeString(slide?.src),
+      src: sanitizeMediaSrc(slide?.src),
       alt: safeString(slide?.alt),
     }))
     .filter((slide) => slide.src.trim());
@@ -75,7 +76,7 @@ function normalizeVideoSlides(slides) {
     .map((item) => ({
       title: safeString(item?.title),
       subtitle: safeString(item?.subtitle),
-      videoSrc: safeString(item?.videoSrc),
+      videoSrc: sanitizeMediaSrc(item?.videoSrc),
     }))
     .filter((item) => item.videoSrc.trim());
 }

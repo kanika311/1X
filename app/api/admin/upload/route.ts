@@ -6,7 +6,13 @@ import { connectDB } from "@/lib/db/mongoose";
 import { UPLOAD_DIR } from "@/lib/server/middleware/upload.js";
 import { ensureUploadDir } from "@/lib/server/ensure-upload-dir.js";
 import { normalizeImageForStorage, publicUploadUrl } from "@/lib/server/mediaUrl.js";
-import { createRoute, buildBridgeRequest, handleBridgeError } from "@/lib/api/route-bridge";
+import {
+  buildBridgeRequest,
+  createRoute,
+  handleBridgeError,
+  resolveUser,
+} from "@/lib/api/route-bridge";
+import { assertAllowedUpload, safeUploadFilename } from "@/lib/server/file-validation.js";
 import * as upload from "@/services/uploadController.js";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +20,12 @@ export const dynamic = "force-dynamic";
 export const POST = async (request: NextRequest) => {
   try {
     await connectDB();
+
+    const user = await resolveUser(request);
+    if (!user || user.role !== "admin") {
+      return NextResponse.json({ success: false, message: "Admin access required" }, { status: 403 });
+    }
+
     const form = await request.formData();
     const file = form.get("file");
     if (!file || !(file instanceof Blob)) {
@@ -39,17 +51,14 @@ export const POST = async (request: NextRequest) => {
 
     const original = (file as File).name || (isVideo ? "video.mp4" : "image.jpg");
     const ext = path.extname(original).toLowerCase() || ".jpg";
-    const base = path
-      .basename(original, ext)
-      .replace(/[^a-z0-9-]/gi, "-")
-      .slice(0, 48) || "image";
-    const filename = `${Date.now()}-${base}${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
+    assertAllowedUpload({ buffer, ext, declaredMime: file.type, allowVideo: isVideo });
+    const filename = safeUploadFilename(original, ext);
 
     ensureUploadDir(UPLOAD_DIR);
     await fs.writeFile(path.join(UPLOAD_DIR, filename), buffer);
 
-    const req = await buildBridgeRequest(request, {}, { user: null });
+    const req = await buildBridgeRequest(request, {}, { user });
     req.file = { filename, mimetype: file.type, buffer };
 
     return NextResponse.json({

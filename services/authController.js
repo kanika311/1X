@@ -1,7 +1,19 @@
 import { User } from "@/models/User.js";
-import { signToken } from "@/lib/server/jwt.js";
 import { ApiError, normalizePhone } from "@/lib/server/helpers.js";
 import { isEmailConfigured, sendPasswordResetEmail } from "@/lib/server/email";
+import {
+  buildAuthCookies,
+  buildClearAuthCookies,
+  issueTokenPair,
+  revokeRefreshToken,
+  rotateRefreshToken,
+  REFRESH_COOKIE,
+} from "@/lib/server/auth-cookies.js";
+import { getSiteUrl } from "@/lib/server/env.js";
+import { sanitizeText } from "@/lib/server/sanitize.js";
+import { clientIp, rateLimit } from "@/lib/server/rate-limit.js";
+import { logAuthFailure, logAuthSuccess } from "@/lib/server/security-log.js";
+import { loginSchema, registerSchema } from "@/lib/validation/schemas.ts";
 import crypto from "crypto";
 
 function userDto(user) {
@@ -13,6 +25,27 @@ function userDto(user) {
     email: user.email,
     role: user.role,
   };
+}
+
+function authMeta(req) {
+  return {
+    userAgent: req.get?.("user-agent") || "",
+    ip: clientIp(req),
+  };
+}
+
+function enforceRateLimit(req, keyPrefix, max = 10) {
+  const ip = clientIp(req);
+  const result = rateLimit(`${keyPrefix}:${ip}`, { windowMs: 15 * 60_000, max });
+  if (!result.allowed) {
+    throw new ApiError(429, "Too many attempts. Please try again later.");
+  }
+}
+
+function setAuthCookies(res, userId, role, req) {
+  return issueTokenPair(userId, role, authMeta(req)).then(({ accessToken, refreshToken }) => {
+    res.setCookies(buildAuthCookies(accessToken, refreshToken));
+  });
 }
 
 async function findUsersByLoginId(loginId) {
@@ -30,20 +63,25 @@ async function findUsersByLoginId(loginId) {
 }
 
 export async function register(req, res) {
-  const { name, number, password, role } = req.body;
+  enforceRateLimit(req, "auth:register", 8);
+  const parsed = registerSchema.safeParse(req.body || {});
+  if (!parsed.success) {
+    throw new ApiError(400, parsed.error.issues[0]?.message || "Invalid registration data");
+  }
+  const { name, number, password, role } = parsed.data;
+  const body = parsed.data;
 
   if (role === "admin") {
     throw new ApiError(403, "Admin accounts can only be created from the admin dashboard");
   }
 
-  // Phone is optional — a member can sign up with just an email instead.
   const hasNumberInput = Boolean(String(number ?? "").trim());
   const normalizedNumber = hasNumberInput ? normalizePhone(number) : null;
   if (hasNumberInput && !normalizedNumber) {
     throw new ApiError(400, "Enter a valid phone number");
   }
 
-  const email = String(req.body.email || "").trim().toLowerCase();
+  const email = String(body.email || "").trim().toLowerCase();
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new ApiError(400, "Enter a valid email address");
   }
@@ -52,27 +90,28 @@ export async function register(req, res) {
     throw new ApiError(400, "Enter a phone number or email to sign up");
   }
 
+  if (String(password || "").length < 8) {
+    throw new ApiError(400, "Password must be at least 8 characters");
+  }
+
   if (normalizedNumber && (await User.findOne({ number: normalizedNumber }))) {
     throw new ApiError(409, "Phone number already registered");
   }
 
-  // Email only needs to be unique within the user role — admins can share the same email.
   if (email && (await User.findOne({ email, role: "user" }))) {
     throw new ApiError(409, "Email already registered");
   }
 
   let referredBy;
-
-  if (req.body.referredBy) {
-    const refPhone = normalizePhone(req.body.referredBy);
-
+  if (body.referredBy) {
+    const refPhone = normalizePhone(body.referredBy);
     if (refPhone && refPhone !== normalizedNumber) {
       referredBy = refPhone;
     }
   }
 
   const user = await User.create({
-    name,
+    name: sanitizeText(name, 120),
     password,
     role: "user",
     ...(normalizedNumber ? { number: normalizedNumber } : {}),
@@ -80,23 +119,26 @@ export async function register(req, res) {
     ...(referredBy ? { referredBy } : {}),
   });
 
-  const token = signToken(user._id);
+  await setAuthCookies(res, user._id, user.role, req);
+  logAuthSuccess(user._id, user.role, { action: "register", ip: clientIp(req) });
 
   res.status(201).json({
     success: true,
-    token,
     user: userDto(user),
   });
-
 }
 
 export async function login(req, res) {
-  const { number, identifier, password } = req.body;
+  enforceRateLimit(req, "auth:login", 12);
+  const parsed = loginSchema.safeParse(req.body || {});
+  if (!parsed.success) {
+    throw new ApiError(400, parsed.error.issues[0]?.message || "Invalid login data");
+  }
+  const { number, identifier, password, scope = "user" } = parsed.data;
   const loginId = identifier || number;
 
   const candidates = await findUsersByLoginId(loginId);
 
-  // An email may match both an admin and a user account — sign in whichever password matches.
   let user = null;
   for (const candidate of candidates) {
     if (await candidate.comparePassword(password)) {
@@ -106,16 +148,30 @@ export async function login(req, res) {
   }
 
   if (!user) {
+    logAuthFailure("invalid_credentials", { ip: clientIp(req), scope });
     throw new ApiError(401, "Invalid email, phone, or password");
   }
 
   if (user.active === false) {
+    logAuthFailure("deactivated_account", { userId: String(user._id), ip: clientIp(req) });
     throw new ApiError(403, "This account has been deactivated. Please contact support to reactivate it.");
   }
 
+  if (scope === "admin" && user.role !== "admin") {
+    logAuthFailure("admin_scope_denied", { userId: String(user._id), ip: clientIp(req) });
+    throw new ApiError(403, "This account is not an admin");
+  }
+
+  if (scope === "user" && user.role !== "user") {
+    logAuthFailure("user_scope_denied", { userId: String(user._id), ip: clientIp(req) });
+    throw new ApiError(403, "Please use the admin login page for admin accounts");
+  }
+
+  await setAuthCookies(res, user._id, user.role, req);
+  logAuthSuccess(user._id, user.role, { action: "login", scope, ip: clientIp(req) });
+
   res.json({
     success: true,
-    token: signToken(user._id),
     user: userDto(user),
   });
 }
@@ -124,8 +180,6 @@ export async function login(req, res) {
 export async function deactivateAccount(req, res) {
   if (!req.user) throw new ApiError(401, "Not authorized");
 
-  // Atomic update avoids loading the full doc (password is select:false and
-  // would otherwise fail required-field validation on save()).
   const updated = await User.findByIdAndUpdate(
     req.user._id ?? req.user.id,
     { $set: { active: false } },
@@ -133,7 +187,34 @@ export async function deactivateAccount(req, res) {
   );
   if (!updated) throw new ApiError(404, "Account not found");
 
+  const refreshToken = req.cookies?.[REFRESH_COOKIE];
+  await revokeRefreshToken(refreshToken);
+  res.clearAuthCookies(buildClearAuthCookies());
+
   res.json({ success: true, message: "Your account has been deactivated." });
+}
+
+export async function logout(req, res) {
+  const refreshToken = req.cookies?.[REFRESH_COOKIE];
+  await revokeRefreshToken(refreshToken);
+  res.clearAuthCookies(buildClearAuthCookies());
+  res.json({ success: true, message: "Signed out." });
+}
+
+export async function refreshSession(req, res) {
+  const refreshToken = req.cookies?.[REFRESH_COOKIE];
+  if (!refreshToken) {
+    throw new ApiError(401, "Session expired. Please sign in again.");
+  }
+
+  const rotated = await rotateRefreshToken(refreshToken, authMeta(req));
+  if (!rotated) {
+    res.clearAuthCookies(buildClearAuthCookies());
+    throw new ApiError(401, "Session expired. Please sign in again.");
+  }
+
+  res.setCookies(buildAuthCookies(rotated.accessToken, rotated.refreshToken));
+  res.json({ success: true });
 }
 
 export async function me(req, res) {
@@ -152,7 +233,7 @@ export async function updateProfile(req, res) {
   if (!user) throw new ApiError(404, "Account not found");
 
   if (req.body.name !== undefined) {
-    const name = String(req.body.name).trim();
+    const name = sanitizeText(req.body.name, 120);
     if (!name) throw new ApiError(400, "Name cannot be empty");
     user.name = name;
   }
@@ -185,33 +266,12 @@ function hashResetToken(token) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-function getFrontendUrl(req) {
-  // Prefer the actual origin the request came from so reset links always point
-  // at the live domain (https://1xdrayxh.com) in prod and localhost in dev —
-  // without depending on a (possibly stale) FRONTEND_URL env var.
-  if (req) {
-    const origin = req.get?.("origin");
-    if (origin && /^https?:\/\//i.test(origin)) {
-      return origin.replace(/\/$/, "");
-    }
-    const host = req.get?.("x-forwarded-host") || req.get?.("host");
-    if (host) {
-      const proto = (req.get?.("x-forwarded-proto") || req.protocol || "https")
-        .split(",")[0]
-        .trim();
-      return `${proto}://${host}`.replace(/\/$/, "");
-    }
-  }
-
-  const raw =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.FRONTEND_URL ||
-    (process.env.ADMIN_APP_URL || "").replace(/\/admin\/?$/, "") ||
-    "http://localhost:3000";
-  return String(raw).replace(/\/$/, "");
+function getFrontendUrl() {
+  return getSiteUrl();
 }
 
 export async function forgotPassword(req, res) {
+  enforceRateLimit(req, "auth:forgot-password", 6);
   const email = String(req.body.email || "")
     .trim()
     .toLowerCase();
@@ -241,7 +301,7 @@ export async function forgotPassword(req, res) {
   user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
   await user.save();
 
-  const resetUrl = `${getFrontendUrl(req)}/admin/reset-password?token=${rawToken}`;
+  const resetUrl = `${getFrontendUrl()}/admin/reset-password?token=${rawToken}`;
 
   try {
     await sendPasswordResetEmail({
@@ -270,8 +330,8 @@ export async function resetPassword(req, res) {
   if (!token) {
     throw new ApiError(400, "Reset token is required");
   }
-  if (!password || password.length < 6) {
-    throw new ApiError(400, "Password must be at least 6 characters");
+  if (!password || password.length < 8) {
+    throw new ApiError(400, "Password must be at least 8 characters");
   }
 
   const user = await User.findOne({
@@ -297,6 +357,7 @@ export async function resetPassword(req, res) {
 
 /** Member (user) forgot password — emails a reset link to the website /reset-password page. */
 export async function userForgotPassword(req, res) {
+  enforceRateLimit(req, "auth:user-forgot-password", 6);
   const email = String(req.body.email || "")
     .trim()
     .toLowerCase();
@@ -322,7 +383,7 @@ export async function userForgotPassword(req, res) {
   user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
   await user.save();
 
-  const resetUrl = `${getFrontendUrl(req)}/reset-password?token=${rawToken}`;
+  const resetUrl = `${getFrontendUrl()}/reset-password?token=${rawToken}`;
 
   try {
     await sendPasswordResetEmail({ to: email, name: user.name, resetUrl });
@@ -347,8 +408,8 @@ export async function userResetPassword(req, res) {
   if (!token) {
     throw new ApiError(400, "Reset token is required");
   }
-  if (!password || password.length < 6) {
-    throw new ApiError(400, "Password must be at least 6 characters");
+  if (!password || password.length < 8) {
+    throw new ApiError(400, "Password must be at least 8 characters");
   }
 
   const user = await User.findOne({

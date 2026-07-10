@@ -2,10 +2,12 @@ import mongoose from "mongoose";
 import { Testimonial } from "@/models/Testimonial.js";
 import { ApiError } from "@/lib/server/helpers.js";
 import { normalizeImageForStorage, resolveMediaUrl } from "@/lib/server/mediaUrl.js";
+import { sanitizeText } from "@/lib/server/sanitize.js";
 
-function formatTestimonial(doc, req) {
+function formatTestimonial(doc, req, { includeEmail = false } = {}) {
   const t = doc.toObject ? doc.toObject() : { ...doc };
   if (t.photo) t.photo = resolveMediaUrl(t.photo, req);
+  if (!includeEmail) delete t.email;
   return t;
 }
 
@@ -51,15 +53,15 @@ export async function listTestimonials(req, res) {
   res.json({
     success: true,
     total,
-    testimonials: items.map((t) => formatTestimonial(t, req)),
+    testimonials: items.map((t) => formatTestimonial(t, req, { includeEmail: isAdmin })),
   });
 }
 
 export async function submitTestimonial(req, res) {
-  const fullName = String(req.body.fullName ?? "").trim();
+  const fullName = sanitizeText(req.body.fullName, 120);
   const email = String(req.body.email ?? "").trim().toLowerCase();
-  const serviceUsed = String(req.body.serviceUsed ?? "").trim();
-  const message = String(req.body.message ?? "").trim();
+  const serviceUsed = sanitizeText(req.body.serviceUsed, 200);
+  const message = sanitizeText(req.body.message, 5000);
   const rating = parseRating(req.body.rating);
   const serviceDate = parseServiceDate(req.body.serviceDate);
   const consent = req.body.consent === true || req.body.consent === "true" || req.body.consent === "on";
@@ -109,7 +111,7 @@ export async function updateTestimonial(req, res) {
   if (featured !== undefined) testimonial.featured = Boolean(featured);
 
   await testimonial.save();
-  res.json({ success: true, testimonial: formatTestimonial(testimonial, req) });
+  res.json({ success: true, testimonial: formatTestimonial(testimonial, req, { includeEmail: true }) });
 }
 
 export async function deleteTestimonial(req, res) {

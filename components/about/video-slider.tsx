@@ -28,7 +28,7 @@ function VideoCard({
   onActivate: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const videoSrc = resolveApiMediaUrl(item.videoSrc) || item.videoSrc;
+  const videoSrc = resolveApiMediaUrl(item.videoSrc);
 
   useEffect(() => {
     const video = videoRef.current;

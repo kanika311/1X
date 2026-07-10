@@ -120,7 +120,7 @@ export function AboutHeroSlider({ initialSlides }: AboutHeroSliderProps) {
   if (count === 0) return null;
 
   const slide = slides[index] ?? slides[0];
-  const mediaSrc = resolveApiMediaUrl(slide.src) || slide.src;
+  const mediaSrc = resolveApiMediaUrl(slide.src);
 
   return (
     <section ref={sectionRef} className="relative w-full overflow-hidden bg-cream">

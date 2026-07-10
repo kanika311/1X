@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/api";
+import { sanitizeMailtoHref, sanitizeTelHref } from "@/lib/safe-url";
 import { openGmailReply, openMailtoReply } from "@/lib/reply-email";
 
 type ContactInquiry = {
@@ -137,14 +138,14 @@ export default function ContactInquiriesPage() {
                 <div>
                   <h2 className="font-medium text-ink">{item.name}</h2>
                   <p className="mt-1 text-sm text-muted">
-                    <a href={`mailto:${item.email}`} className="hover:text-ink hover:underline">
+                    <a href={sanitizeMailtoHref(item.email)} className="hover:text-ink hover:underline">
                       {item.email}
                     </a>
                     {item.phone ? (
                       <>
                         {" "}
                         ·{" "}
-                        <a href={`tel:${item.phone}`} className="hover:text-ink hover:underline">
+                        <a href={sanitizeTelHref(item.phone)} className="hover:text-ink hover:underline">
                           {item.phone}
                         </a>
                       </>

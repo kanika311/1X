@@ -7,6 +7,7 @@ import { RiWhatsappLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { submitContactInquiry } from "@/lib/contact-inquiry-api";
+import { sanitizeLinkedInUrl, sanitizeMailtoHref, sanitizeTelHref } from "@/lib/safe-url";
 import { resolveContactFields, type SiteContent } from "@/lib/site-content-api";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -43,9 +44,9 @@ export function ContactContent({ initialContent = null }: ContactContentProps) {
     linkedin,
   } = resolveContactFields(content);
 
-  const phoneDigits = contactPhone.replace(/[^\d+]/g, "");
-  const telHref = phoneDigits ? `tel:${phoneDigits}` : "#";
+  const telHref = sanitizeTelHref(contactPhone);
   const whatsappDigits = (whatsapp || contactPhone).replace(/\D/g, "");
+  const linkedinHref = sanitizeLinkedInUrl(linkedin);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -152,7 +153,7 @@ export function ContactContent({ initialContent = null }: ContactContentProps) {
             </li>
             <li className="flex gap-3">
               <FiMail className="shrink-0" />
-              <a href={`mailto:${contactEmail}`} className="hover:text-ink">
+              <a href={sanitizeMailtoHref(contactEmail)} className="hover:text-ink">
                 {contactEmail}
               </a>
             </li>
@@ -162,10 +163,10 @@ export function ContactContent({ initialContent = null }: ContactContentProps) {
                 {contactPhone}
               </a>
             </li>
-            {linkedin ? (
+            {linkedinHref ? (
               <li className="flex gap-3">
                 <FiLinkedin className="shrink-0" />
-                <a href={linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-ink">
+                <a href={linkedinHref} target="_blank" rel="noopener noreferrer" className="hover:text-ink">
                   LinkedIn Profile
                 </a>
               </li>

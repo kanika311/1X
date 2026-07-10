@@ -1,16 +1,22 @@
 import { getApiBaseUrl } from "@/lib/api-base";
 
-const TOKEN_KEY = "onex-token";
+const FETCH_CREDENTIALS: RequestCredentials = "include";
 
 export function getAuthToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return null;
 }
 
-export function setAuthToken(token: string | null) {
-  if (typeof window === "undefined") return;
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
+export function setAuthToken(_token: string | null) {
+  /* Tokens are stored in httpOnly cookies — not accessible from JavaScript. */
+}
+
+async function refreshSessionIfNeeded(res: Response): Promise<boolean> {
+  if (res.status !== 401) return false;
+  const refreshRes = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
+    method: "POST",
+    credentials: FETCH_CREDENTIALS,
+  });
+  return refreshRes.ok;
 }
 
 export async function apiRequest<T>(
@@ -19,20 +25,22 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const { auth = false, headers, ...rest } = options;
   const h: HeadersInit = { "Content-Type": "application/json", ...(headers || {}) };
-  if (auth) {
-    const token = getAuthToken();
-    if (!token) throw new Error("Not signed in");
-    (h as Record<string, string>).Authorization = `Bearer ${token}`;
-  }
 
   const apiBase = getApiBaseUrl();
   const url = `${apiBase}${path.startsWith("/") ? path : `/${path}`}`;
 
   let res: Response;
   try {
-    res = await fetch(url, { ...rest, headers: h });
+    res = await fetch(url, { ...rest, headers: h, credentials: FETCH_CREDENTIALS });
   } catch {
     throw new Error("Cannot reach API. Check your connection or API configuration.");
+  }
+
+  if (auth && res.status === 401) {
+    const refreshed = await refreshSessionIfNeeded(res);
+    if (refreshed) {
+      res = await fetch(url, { ...rest, headers: h, credentials: FETCH_CREDENTIALS });
+    }
   }
 
   const data = await res.json().catch(() => ({}));
@@ -40,4 +48,11 @@ export async function apiRequest<T>(
     throw new Error((data as { message?: string }).message || `Request failed (${res.status})`);
   }
   return data as T;
+}
+
+export async function logoutSession() {
+  await fetch(`${getApiBaseUrl()}/auth/logout`, {
+    method: "POST",
+    credentials: FETCH_CREDENTIALS,
+  }).catch(() => {});
 }

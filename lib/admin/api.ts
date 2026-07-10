@@ -9,18 +9,14 @@ export class ApiError extends Error {
 }
 
 export function getToken() {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("onex_admin_token");
+  return null;
 }
 
-export function setToken(token: string | null) {
-  if (typeof window === "undefined") return;
-  if (token) localStorage.setItem("onex_admin_token", token);
-  else localStorage.removeItem("onex_admin_token");
+export function setToken(_token: string | null) {
+  /* Admin session is stored in httpOnly cookies. */
 }
 
 export function clearAdminSession() {
-  setToken(null);
   if (typeof window !== "undefined") {
     localStorage.removeItem("onex_admin_user");
   }
@@ -28,17 +24,24 @@ export function clearAdminSession() {
 
 type ApiFetchOptions = Omit<RequestInit, "body"> & { body?: unknown };
 
+async function refreshAdminSession(): Promise<boolean> {
+  const res = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
+    method: "POST",
+    credentials: "include",
+  });
+  return res.ok;
+}
+
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}) {
   const { body, headers, ...rest } = options;
   const h: HeadersInit = { "Content-Type": "application/json", ...(headers || {}) };
-  const token = getToken();
-  if (token) (h as Record<string, string>).Authorization = `Bearer ${token}`;
 
   let res: Response;
   try {
     res = await fetch(`${getApiBaseUrl()}${path}`, {
       ...rest,
       headers: h,
+      credentials: "include",
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {
@@ -46,6 +49,18 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}) {
       0,
       "Cannot reach API. Make sure `npm run dev` is running and open the same port shown in the terminal (usually http://localhost:3000).",
     );
+  }
+
+  if (res.status === 401) {
+    const refreshed = await refreshAdminSession();
+    if (refreshed) {
+      res = await fetch(`${getApiBaseUrl()}${path}`, {
+        ...rest,
+        headers: h,
+        credentials: "include",
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+      });
+    }
   }
 
   const data = await res.json().catch(() => ({}));

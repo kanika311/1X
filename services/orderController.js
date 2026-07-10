@@ -1,6 +1,10 @@
 import { Order } from "@/models/Order.js";
 import { User } from "@/models/User.js";
 import { ApiError, normalizePhone } from "@/lib/server/helpers.js";
+import { resolveOrderLineItem } from "@/lib/server/resolveOfferingPrice.js";
+import { verifySpinPromoCode } from "@/lib/server/spin-promo.js";
+import { sanitizeText } from "@/lib/server/sanitize.js";
+import { logAdminAction } from "@/lib/server/security-log.js";
 
 function phoneDigits(value) {
   return String(value ?? "").replace(/\D/g, "");
@@ -60,64 +64,58 @@ function formatOrder(doc) {
   };
 }
 
+function orderBelongsToUser(order, user) {
+  if (!user || !order.user) return false;
+  return String(order.user) === String(user._id);
+}
+
 export async function createOrder(req, res) {
+  if (!req.user) {
+    throw new ApiError(401, "Sign in to place an order");
+  }
+
   const { customerName, customerEmail, customerPhone, items, notes } = req.body;
 
   if (!Array.isArray(items) || items.length === 0) {
     throw new ApiError(400, "Cart is empty");
   }
 
-  const normalized = items.map((item) => {
-    let type = "course";
-    if (item.type === "service") type = "service";
-    if (item.type === "membership") type = "membership";
-    return {
-      cartKey: String(item.cartKey),
-      offeringId: String(item.offeringId || ""),
-      type,
-      title: String(item.title),
-      price: Number(item.price),
-      quantity: Math.max(1, Number(item.quantity) || 1),
-      image: String(item.image || ""),
-      duration: String(item.duration || ""),
-    };
-  });
+  const normalized = [];
+  for (const item of items) {
+    normalized.push(await resolveOrderLineItem(item));
+  }
 
   const lineSubtotal = normalized.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   let promoCode = String(req.body.promoCode || "").trim().toUpperCase();
-  let discountPercent = Math.min(5, Math.max(0, Number(req.body.discountPercent) || 0));
-  let discountAmount = Math.max(0, Number(req.body.discountAmount) || 0);
+  let discountPercent = 0;
+  let discountAmount = 0;
 
-  const spinMatch = promoCode.match(/^SPIN([0-5])-[A-Z0-9]{4}$/);
-  if (spinMatch) {
-    discountPercent = Number(spinMatch[1]);
-    if (discountPercent < 1) {
-      promoCode = "";
-      discountPercent = 0;
-      discountAmount = 0;
-    } else {
-      discountAmount = Math.min(
-        lineSubtotal,
-        discountAmount > 0 ? discountAmount : Math.round((lineSubtotal * discountPercent) / 100),
-      );
-    }
+  const verifiedSpin = promoCode ? verifySpinPromoCode(req.user._id, promoCode) : null;
+  if (verifiedSpin) {
+    discountPercent = verifiedSpin.percent;
+    discountAmount = Math.min(
+      lineSubtotal,
+      Math.round((lineSubtotal * discountPercent) / 100),
+    );
+    promoCode = verifiedSpin.code;
   } else {
     promoCode = "";
-    discountPercent = 0;
-    discountAmount = 0;
   }
 
   const subtotal = Math.max(0, lineSubtotal - discountAmount);
+  if (subtotal <= 0) {
+    throw new ApiError(400, "Order total must be greater than zero");
+  }
 
-  const linkedUser = req.user?._id ?? null;
+  const linkedUser = req.user._id;
   const normalizedPhone = customerPhone ? normalizePhone(customerPhone) || phoneDigits(customerPhone) : "";
-  const accountPhone = req.user?.number ? normalizePhone(req.user.number) || req.user.number : "";
+  const accountPhone = req.user.number ? normalizePhone(req.user.number) || req.user.number : "";
 
   const order = await Order.create({
     user: linkedUser,
-    customerName: customerName.trim(),
-    customerEmail: customerEmail.trim().toLowerCase(),
+    customerName: (customerName || req.user.name || "").trim(),
+    customerEmail: (customerEmail || req.user.email || "").trim().toLowerCase(),
     customerPhone: normalizedPhone || accountPhone || (customerPhone || "").trim(),
     items: normalized,
     lineSubtotal,
@@ -125,7 +123,7 @@ export async function createOrder(req, res) {
     discountPercent: discountPercent || undefined,
     discountAmount: discountAmount || undefined,
     subtotal,
-    notes: (notes || "").trim(),
+    notes: sanitizeText(notes, 2000),
     status: "pending",
     paymentStatus: "awaiting",
   });
@@ -134,13 +132,23 @@ export async function createOrder(req, res) {
 }
 
 export async function submitOrderPayment(req, res) {
+  if (!req.user) {
+    throw new ApiError(401, "Sign in to confirm payment");
+  }
+
   const order = await Order.findById(req.params.id);
   if (!order) throw new ApiError(404, "Order not found");
+  if (!orderBelongsToUser(order, req.user)) {
+    throw new ApiError(403, "You can only confirm payment for your own orders");
+  }
   if (order.status === "cancelled") {
     throw new ApiError(400, "This order was cancelled");
   }
   if (order.paymentStatus === "confirmed") {
     throw new ApiError(400, "Payment already confirmed for this order");
+  }
+  if (!Number.isFinite(order.subtotal) || order.subtotal <= 0) {
+    throw new ApiError(400, "This order cannot be paid");
   }
 
   const paymentReference = String(req.body?.paymentReference ?? "").trim();
@@ -332,14 +340,16 @@ export async function listOrders(req, res) {
   if (userId) filter.user = userId;
   if (email) filter.customerEmail = String(email).toLowerCase();
   if (phone) {
-    const digits = String(phone).replace(/\D/g, "");
-    if (digits) filter.customerPhone = new RegExp(digits);
+    const digits = String(phone).replace(/\D/g, "").slice(0, 15);
+    if (digits) filter.customerPhone = { $regex: digits.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") };
   }
+
+  const safeLimit = Math.min(200, Math.max(1, Number(limit) || 100));
 
   const orders = await Order.find(filter)
     .populate("user", "name number email")
     .sort({ createdAt: -1 })
-    .limit(Number(limit))
+    .limit(safeLimit)
     .lean();
 
   res.json({
@@ -371,5 +381,9 @@ export async function updateOrderStatus(req, res) {
     order.paymentStatus = "awaiting";
   }
   await order.save();
+  logAdminAction("order_status_update", req.user._id, {
+    orderId: String(order._id),
+    status,
+  });
   res.json({ success: true, order: formatOrder(order) });
 }

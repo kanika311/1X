@@ -98,6 +98,9 @@ export async function listOffers(req, res) {
 
 export async function getOffer(req, res) {
   const offer = await findOffer(req.params.id);
+  if (!req.user || req.user.role !== "admin") {
+    if (!offer.active) throw new ApiError(404, "Offer not found");
+  }
   const forAdmin = req.user?.role === "admin";
   res.json({ success: true, offer: serializeOffer(offer, { forAdmin }) });
 }

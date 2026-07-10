@@ -1,17 +1,18 @@
-import { apiFetch, clearAdminSession, setToken, type AdminUser } from "@/lib/admin/api";
+import { apiFetch, clearAdminSession, type AdminUser } from "@/lib/admin/api";
+import { getApiBaseUrl } from "@/lib/api-base";
 
 export async function adminLogin(identifier: string, password: string) {
-  const data = await apiFetch<{ token: string; user: AdminUser }>("/auth/login", {
+  const data = await apiFetch<{ user: AdminUser }>("/auth/login", {
     method: "POST",
-    body: { identifier, password },
+    body: { identifier, password, scope: "admin" },
   });
   if (data.user.role !== "admin") throw new Error("This account is not an admin");
-  setToken(data.token);
   localStorage.setItem("onex_admin_user", JSON.stringify(data.user));
   return data.user;
 }
 
-export function adminLogout() {
+export async function adminLogout() {
+  await fetch(`${getApiBaseUrl()}/auth/logout`, { method: "POST", credentials: "include" }).catch(() => {});
   clearAdminSession();
 }
 

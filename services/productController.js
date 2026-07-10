@@ -54,6 +54,9 @@ export async function listProducts(req, res) {
 
 export async function getProduct(req, res) {
   const product = await findProduct(req.params.id);
+  if (!req.user || req.user.role !== "admin") {
+    if (!product.active) throw new ApiError(404, "Product not found");
+  }
   res.json({ success: true, product: formatProduct(product, req) });
 }
 

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/api";
+import { sanitizeMailtoHref } from "@/lib/safe-url";
 
 type Subscriber = {
   _id: string;
@@ -84,7 +85,7 @@ export default function NewsletterPage() {
               {items.map((s) => (
                 <tr key={s._id} className="border-b border-rose-50">
                   <td className="px-4 py-3">
-                    <a href={`mailto:${s.email}`} className="font-medium text-ink hover:text-mauve-deep hover:underline">
+                    <a href={sanitizeMailtoHref(s.email)} className="font-medium text-ink hover:text-mauve-deep hover:underline">
                       {s.email}
                     </a>
                   </td>

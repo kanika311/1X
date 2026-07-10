@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, trim: true, lowercase: true },
     number: { type: String, sparse: true, unique: true, trim: true },
   
-    password: { type: String, required: true, minlength: 6, select: false },
+    password: { type: String, required: true, minlength: 8, select: false },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     /** When false the account is deactivated and cannot sign in */
     active: { type: Boolean, default: true },

@@ -1,7 +1,5 @@
 import { createRoute } from "@/lib/api/route-bridge";
 import * as auth from "@/services/authController.js";
 
-export const POST = createRoute(auth.forgotPassword, {
-  rateLimit: { windowMs: 15 * 60_000, max: 6, keyPrefix: "auth:forgot-password" },
-});
+export const POST = createRoute(auth.logout);
 export const dynamic = "force-dynamic";

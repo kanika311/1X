@@ -89,7 +89,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!authReady) return;
     void loadFromServer();
-  }, [authReady, session?.number, session?.token, loadFromServer]);
+  }, [authReady, session?.number, session?.email, loadFromServer]);
 
   const toggleWishlist = useCallback(
     async (id: string) => {

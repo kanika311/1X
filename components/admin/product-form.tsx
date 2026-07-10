@@ -7,7 +7,7 @@ import * as Yup from "yup";
 
 import { FormFieldError } from "@/components/admin/form-field-error";
 import { ImageUploadField } from "@/components/admin/image-upload-field";
-import { apiFetch, getToken, type Product } from "@/lib/api";
+import { apiFetch, type Product } from "@/lib/api";
 import { ADMIN } from "@/lib/admin/routes";
 import { toUploadStoragePath } from "@/lib/media-url";
 
@@ -100,11 +100,6 @@ export function ProductForm({ product }: { product?: Product }) {
       onSubmit={async (values, { setSubmitting }) => {
         setError("");
         setShowAllErrors(false);
-        if (!getToken()) {
-          setError("You are not logged in. Open Login and sign in as admin, then try again.");
-          setSubmitting(false);
-          return;
-        }
         const body = {
           slug: values.slug.trim(),
           domain: values.domain,

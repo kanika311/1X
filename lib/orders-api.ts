@@ -1,6 +1,20 @@
-import { getAuthToken } from "@/lib/api-client";
+import { getApiBaseUrl } from "@/lib/api-base";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
+const API = getApiBaseUrl();
+
+async function apiFetchJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API}${path}`, {
+    ...init,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(init?.headers || {}),
+    },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error((data as { message?: string }).message || "Request failed");
+  return data as T;
+}
 
 export type OrderItemPayload = {
   cartKey: string;
@@ -57,41 +71,24 @@ export type PlaceOrderPayload = {
 };
 
 export async function placeOrder(payload: PlaceOrderPayload) {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = getAuthToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
-
-  const res = await fetch(`${API}/orders`, {
+  return apiFetchJson<{ success: boolean; order: PlacedOrder }>("/orders", {
     method: "POST",
-    headers,
     body: JSON.stringify(payload),
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || "Could not place order");
-  return data as { success: boolean; order: PlacedOrder };
 }
 
 export async function submitOrderPayment(orderId: string, paymentReference: string) {
-  const res = await fetch(`${API}/orders/${orderId}/confirm-payment`, {
+  return apiFetchJson<{ success: boolean; order: PlacedOrder }>(`/orders/${orderId}/confirm-payment`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ paymentReference: paymentReference.trim() }),
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || "Could not update payment");
-  return data as { success: boolean; order: PlacedOrder };
 }
 
 export async function fetchMyOrders(): Promise<UserOrder[]> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = getAuthToken();
-  if (!token) return [];
-
-  const res = await fetch(`${API}/orders/mine`, {
-    headers: { ...headers, Authorization: `Bearer ${token}` },
-    cache: "no-store",
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) return [];
-  return (data.orders as UserOrder[]) || [];
+  try {
+    const data = await apiFetchJson<{ orders: UserOrder[] }>("/orders/mine", { cache: "no-store" });
+    return data.orders || [];
+  } catch {
+    return [];
+  }
 }

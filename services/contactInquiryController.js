@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { ContactInquiry } from "@/models/ContactInquiry.js";
 import { ApiError } from "@/lib/server/helpers.js";
+import { sanitizeText } from "@/lib/server/sanitize.js";
 
 async function findInquiry(id) {
   if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(404, "Inquiry not found");
@@ -10,10 +11,10 @@ async function findInquiry(id) {
 }
 
 export async function submitContactInquiry(req, res) {
-  const name = String(req.body.name ?? "").trim();
+  const name = sanitizeText(req.body.name, 120);
   const email = String(req.body.email ?? "").trim().toLowerCase();
-  const phone = String(req.body.phone ?? "").trim();
-  const message = String(req.body.message ?? "").trim();
+  const phone = sanitizeText(req.body.phone, 20);
+  const message = sanitizeText(req.body.message, 5000);
 
   if (!name) throw new ApiError(400, "Name is required");
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -34,7 +35,6 @@ export async function submitContactInquiry(req, res) {
   res.status(201).json({
     success: true,
     message: "Thank you — we will respond within 24 hours.",
-    inquiry: inquiry.toObject(),
   });
 }
 

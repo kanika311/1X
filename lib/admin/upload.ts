@@ -1,7 +1,8 @@
-import { ApiError, getToken } from "@/lib/api";
+import { ApiError } from "@/lib/api";
 import { toUploadStoragePath } from "@/lib/media-url";
+import { getApiBaseUrl } from "@/lib/api-base";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "/api";
+const API = getApiBaseUrl();
 
 export type MediaItem = { filename: string; url: string; path?: string; createdAt: string; size: number };
 
@@ -16,11 +17,12 @@ export async function uploadVideoFile(file: File): Promise<string> {
 async function uploadMediaFile(file: File): Promise<string> {
   const form = new FormData();
   form.append("file", file);
-  const token = getToken();
-  const headers: HeadersInit = {};
-  if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`${API}/admin/upload`, { method: "POST", headers, body: form });
+  const res = await fetch(`${API}/admin/upload`, {
+    method: "POST",
+    credentials: "include",
+    body: form,
+  });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new ApiError(res.status, data.message || "Upload failed");
 
@@ -28,10 +30,7 @@ async function uploadMediaFile(file: File): Promise<string> {
 }
 
 export async function listMedia(): Promise<MediaItem[]> {
-  const token = getToken();
-  const headers: HeadersInit = {};
-  if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(`${API}/admin/media`, { headers });
+  const res = await fetch(`${API}/admin/media`, { credentials: "include" });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new ApiError(res.status, data.message || "Could not load media");
   return (data.media as MediaItem[]).map((m) => ({

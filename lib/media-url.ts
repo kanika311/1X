@@ -1,4 +1,5 @@
 import { FALLBACK_IMAGE } from "@/lib/image-fallback";
+import { sanitizeMediaSrc } from "@/lib/safe-url";
 
 /** Save only /uploads/filename or full Cloudinary URL in MongoDB. */
 export function toUploadStoragePath(url: string | undefined | null): string {
@@ -27,7 +28,9 @@ export function resolveApiMediaUrl(url: string | undefined | null): string {
 
   if (trimmed.startsWith("/uploads/")) return trimmed;
 
-  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith("data:")) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) {
+    return sanitizeMediaSrc(trimmed);
+  }
 
   return trimmed;
 }

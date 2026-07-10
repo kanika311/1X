@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { apiRequest, setAuthToken } from "@/lib/api-client";
+import { apiRequest, logoutSession } from "@/lib/api-client";
 import { decodeReferralCode, getStoredReferralCode } from "@/lib/referral";
 
 export type AuthSession = null | {
@@ -18,7 +18,6 @@ export type AuthSession = null | {
   number?: string;
   name: string;
   email?: string;
-  token: string;
 };
 
 type AuthContextValue = {
@@ -36,7 +35,7 @@ type AuthContextValue = {
   logout: () => void;
 };
 
-const STORAGE_KEY = "onex-auth-v2";
+const STORAGE_KEY = "onex-auth-profile";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -45,16 +44,14 @@ function normalizeStoredNumber(value: string) {
   return digits.length >= 10 ? digits : value;
 }
 
-function loadStoredSession(): AuthSession {
+function loadStoredProfile(): AuthSession {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as AuthSession & { email?: string };
     const number = parsed?.number ? normalizeStoredNumber(parsed.number) : "";
-    // A session is valid if it has a token and at least one identifier (phone or email).
-    if (parsed?.type === "user" && parsed.token && (number || parsed.email)) {
-      setAuthToken(parsed.token);
-      return { type: "user", number, name: parsed.name, email: parsed.email, token: parsed.token };
+    if (parsed?.type === "user" && (number || parsed.email)) {
+      return { type: "user", number, name: parsed.name, email: parsed.email };
     }
   } catch {
     /* ignore */
@@ -62,23 +59,48 @@ function loadStoredSession(): AuthSession {
   return null;
 }
 
+async function fetchCurrentUser(): Promise<AuthSession> {
+  try {
+    const data = await apiRequest<{ user: { name: string; number?: string; email?: string; role: string } }>(
+      "/auth/me",
+      { auth: true },
+    );
+    if (!data?.user || data.user.role !== "user") return null;
+    const userNumber = data.user.number ? normalizeStoredNumber(data.user.number) : "";
+    return {
+      type: "user",
+      number: userNumber,
+      name: data.user.name,
+      email: data.user.email,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession>(null);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    setSession(loadStoredSession());
-    setIsReady(true);
+    void (async () => {
+      const fromCookie = await fetchCurrentUser();
+      if (fromCookie) {
+        setSession(fromCookie);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fromCookie));
+      } else {
+        setSession(loadStoredProfile());
+      }
+      setIsReady(true);
+    })();
   }, []);
 
   const persist = useCallback((next: AuthSession) => {
     setSession(next);
     if (next?.type === "user") {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      setAuthToken(next.token);
     } else {
       localStorage.removeItem(STORAGE_KEY);
-      setAuthToken(null);
       localStorage.removeItem("onex-wishlist");
       localStorage.removeItem("onex-cart");
     }
@@ -90,19 +112,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const trimmed = identifier.trim();
         const digits = normalizeStoredNumber(trimmed);
         const data = await apiRequest<{
-          token: string;
-          user: { name: string; number?: string; email?: string };
+          user: { name: string; number?: string; email?: string; role: string };
         }>("/auth/login", {
           method: "POST",
-          body: JSON.stringify({ identifier: trimmed, number: digits, password }),
+          body: JSON.stringify({ identifier: trimmed, number: digits, password, scope: "user" }),
         });
+        if (data.user.role !== "user") {
+          return "Please use the admin login page for admin accounts";
+        }
         const userNumber = data.user.number ? normalizeStoredNumber(data.user.number) : "";
         persist({
           type: "user",
           number: userNumber,
           name: data.user.name,
           email: data.user.email,
-          token: data.token,
         });
         return null;
       } catch (e) {
@@ -125,7 +148,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const referredBy = refCode ? decodeReferralCode(refCode) : null;
         const trimmedEmail = email?.trim();
         const data = await apiRequest<{
-          token: string;
           user: { name: string; number?: string; email?: string };
         }>("/auth/register", {
           method: "POST",
@@ -144,7 +166,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           number: userNumber,
           name: data.user.name,
           email: data.user.email,
-          token: data.token,
         });
         return null;
       } catch (e) {
@@ -185,11 +206,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const logout = useCallback(() => persist(null), [persist]);
+  const logout = useCallback(() => {
+    void logoutSession();
+    persist(null);
+  }, [persist]);
 
   const deactivateAccount = useCallback(async (): Promise<string | null> => {
     try {
       await apiRequest("/auth/deactivate", { method: "POST", auth: true });
+      await logoutSession();
       persist(null);
       return null;
     } catch (e) {
