@@ -10,12 +10,6 @@ try {
   /* ignore — fall back to system DNS */
 }
 
-const uri = process.env.MONGODB_URI;
-
-if (!uri) {
-  throw new Error("MONGODB_URI is not defined");
-}
-
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -61,6 +55,11 @@ async function runUserIndexMigration() {
 }
 
 export async function connectDB() {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error("MONGODB_URI is not defined");
+  }
+
   if (cached.conn) {
     await runUserIndexMigration();
     return cached.conn;
@@ -68,7 +67,7 @@ export async function connectDB() {
 
   if (!cached.promise) {
     mongoose.set("strictQuery", true);
-    cached.promise = mongoose.connect(uri as string).then((m) => m);
+    cached.promise = mongoose.connect(uri).then((m) => m);
   }
 
   cached.conn = await cached.promise;

@@ -106,11 +106,11 @@ function extractBearerToken(request: NextRequest) {
 }
 
 export async function resolveUser(request: NextRequest): Promise<BridgeUser | null> {
-  ensureEnv();
   const cookies = cookieMap(request);
   const token = cookies[ACCESS_COOKIE] || extractBearerToken(request);
   if (!token) return null;
 
+  ensureEnv();
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload & {
       id: string;
@@ -267,8 +267,6 @@ export type RouteOptions = {
 export function createRoute(controller: Controller, options?: RouteOptions) {
   return async (request: NextRequest, context: { params: Promise<Record<string, string>> }) => {
     try {
-      ensureEnv();
-      await connectDB();
       const params = await context.params;
 
       if (options?.rateLimit) {
@@ -284,6 +282,15 @@ export function createRoute(controller: Controller, options?: RouteOptions) {
         }
       }
 
+      const hasCredentials = Boolean(
+        request.cookies.get(ACCESS_COOKIE)?.value || extractBearerToken(request),
+      );
+      if ((options?.auth || options?.admin) && !hasCredentials) {
+        return NextResponse.json({ success: false, message: "Not authorized" }, { status: 401 });
+      }
+
+      ensureEnv();
+      await connectDB();
       let user = await resolveUser(request);
 
       if (options?.auth && !user) {

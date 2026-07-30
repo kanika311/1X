@@ -18,11 +18,16 @@ function connectSources(): string {
 /** Build a strict, nonce-based CSP (no unsafe-inline / data: in script-src). */
 export function buildContentSecurityPolicy(nonce: string, isDev: boolean): string {
   const devEval = isDev ? " 'unsafe-eval'" : "";
+  // Next.js/React inject <style> elements without nonces; keep scripts strict but
+  // allow inline styles (style-src unsafe-inline is standard for React apps).
+  const styleSources = "'self' 'unsafe-inline'";
 
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${devEval}`,
-    `style-src 'self' 'nonce-${nonce}'`,
+    `style-src ${styleSources}`,
+    `style-src-elem ${styleSources}`,
+    "style-src-attr 'unsafe-inline'",
     `img-src 'self' blob: data: ${CLOUDINARY} ${UNSPLASH}`,
     "font-src 'self'",
     `connect-src ${connectSources()}`,

@@ -8,12 +8,18 @@ const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
+  display: "swap",
+  fallback: ["system-ui", "Segoe UI", "Arial", "sans-serif"],
+  adjustFontFallback: true,
 });
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-cormorant",
+  display: "swap",
+  fallback: ["Georgia", "Times New Roman", "serif"],
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -120,8 +126,9 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={`${inter.variable} ${cormorant.variable} bg-background text-ink antialiased`}
       >
         <AppProviders>{children}</AppProviders>

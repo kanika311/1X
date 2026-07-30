@@ -1,10 +1,16 @@
 /** Block javascript:, data:, and vbscript: URLs in href/src attributes. */
+function canonicalizeLocalAssetPath(value: string): string {
+  const lower = value.toLowerCase();
+  if (lower === "/logo.jpeg") return "/LOGO.jpeg";
+  return value;
+}
+
 export function sanitizeHttpUrl(url: string | undefined | null): string {
   const trimmed = String(url ?? "").trim();
   if (!trimmed) return "";
 
   if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
-    return trimmed;
+    return canonicalizeLocalAssetPath(trimmed);
   }
 
   try {

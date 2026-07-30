@@ -81,9 +81,24 @@ function normalizeVideoSlides(slides) {
     .filter((item) => item.videoSrc.trim());
 }
 
+function normalizeSiteContentDocument(doc) {
+  if (!doc || typeof doc !== "object") return null;
+  return {
+    ...doc,
+    about: normalizeAbout(doc.about),
+    founder: normalizeFounder(doc.founder),
+    homeHeroSlides: normalizeHeroSlides(doc.homeHeroSlides),
+    homeVideoSlides: normalizeVideoSlides(doc.homeVideoSlides),
+    contact: normalizeContact(doc.contact),
+    payment: normalizePayment(doc.payment),
+    privacy: normalizeLegal(doc.privacy),
+    terms: normalizeLegal(doc.terms),
+  };
+}
+
 export async function getSiteContent(_req, res) {
   const doc = await SiteContent.findOne({ key: "default" }).lean();
-  res.json({ success: true, content: doc || null });
+  res.json({ success: true, content: normalizeSiteContentDocument(doc) });
 }
 
 export async function upsertSiteContent(req, res) {
@@ -106,6 +121,6 @@ export async function upsertSiteContent(req, res) {
     { new: true, upsert: true },
   ).lean();
 
-  res.json({ success: true, content: doc });
+  res.json({ success: true, content: normalizeSiteContentDocument(doc) });
 }
 

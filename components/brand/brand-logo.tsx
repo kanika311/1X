@@ -12,10 +12,10 @@ type BrandLogoProps = {
 };
 
 const sizeClass = {
-  sm: { img: 40, tag: "text-[10px] tracking-[0.14em]" },
-  md: { img: 52, tag: "text-[11px] tracking-[0.14em]" },
-  lg: { img: 58, tag: "text-xs tracking-[0.14em]" },
-  xl: { img: 64, tag: "text-xs tracking-[0.14em]" },
+  sm: { img: "size-10", px: 40, tag: "text-[10px] tracking-[0.14em]" },
+  md: { img: "size-[52px]", px: 52, tag: "text-[11px] tracking-[0.14em]" },
+  lg: { img: "size-[58px]", px: 58, tag: "text-xs tracking-[0.14em]" },
+  xl: { img: "size-16", px: 64, tag: "text-xs tracking-[0.14em]" },
 } as const;
 
 export function BrandLogo({ className, size = "md" }: BrandLogoProps) {
@@ -26,10 +26,11 @@ export function BrandLogo({ className, size = "md" }: BrandLogoProps) {
         <Image
           src="/LOGO.jpeg"
           alt="1X"
-          width={s.img}
-          height={s.img}
-          className="rounded-full object-cover"
-          style={{ width: s.img, height: s.img }}
+          width={s.px}
+          height={s.px}
+          unoptimized
+          priority
+          className={cn("rounded-full object-cover", s.img)}
         />
       </span>
     </span>

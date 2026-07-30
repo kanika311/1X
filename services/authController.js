@@ -8,6 +8,7 @@ import {
   revokeRefreshToken,
   rotateRefreshToken,
   REFRESH_COOKIE,
+  verifyAccessToken,
 } from "@/lib/server/auth-cookies.js";
 import { getSiteUrl } from "@/lib/server/env.js";
 import { sanitizeText } from "@/lib/server/sanitize.js";
@@ -218,11 +219,28 @@ export async function refreshSession(req, res) {
 }
 
 export async function me(req, res) {
-  if (!req.user) throw new ApiError(401, "Not authorized");
-  res.json({
-    success: true,
-    user: userDto(req.user),
-  });
+  if (req.user) {
+    return res.json({
+      success: true,
+      user: userDto(req.user),
+    });
+  }
+
+  const refreshToken = req.cookies?.[REFRESH_COOKIE];
+  if (refreshToken) {
+    const rotated = await rotateRefreshToken(refreshToken, authMeta(req));
+    if (rotated) {
+      res.setCookies(buildAuthCookies(rotated.accessToken, rotated.refreshToken));
+      const decoded = verifyAccessToken(rotated.accessToken);
+      const user = await User.findById(decoded.id).select("-password");
+      if (user && user.active !== false) {
+        return res.json({ success: true, user: userDto(user) });
+      }
+    }
+    res.clearAuthCookies(buildClearAuthCookies());
+  }
+
+  res.json({ success: true, user: null });
 }
 
 /** Update the signed-in member's name / email (email enables password reset). */

@@ -44,26 +44,10 @@ function normalizeStoredNumber(value: string) {
   return digits.length >= 10 ? digits : value;
 }
 
-function loadStoredProfile(): AuthSession {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as AuthSession & { email?: string };
-    const number = parsed?.number ? normalizeStoredNumber(parsed.number) : "";
-    if (parsed?.type === "user" && (number || parsed.email)) {
-      return { type: "user", number, name: parsed.name, email: parsed.email };
-    }
-  } catch {
-    /* ignore */
-  }
-  return null;
-}
-
 async function fetchCurrentUser(): Promise<AuthSession> {
   try {
-    const data = await apiRequest<{ user: { name: string; number?: string; email?: string; role: string } }>(
+    const data = await apiRequest<{ user: { name: string; number?: string; email?: string; role: string } | null }>(
       "/auth/me",
-      { auth: true },
     );
     if (!data?.user || data.user.role !== "user") return null;
     const userNumber = data.user.number ? normalizeStoredNumber(data.user.number) : "";
@@ -89,7 +73,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(fromCookie);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(fromCookie));
       } else {
-        setSession(loadStoredProfile());
+        // The HttpOnly cookie is the source of truth. A cached profile without
+        // a valid cookie is stale and must not trigger authenticated API calls.
+        setSession(null);
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem("onex-auth-v2");
+        localStorage.removeItem("onex-token");
       }
       setIsReady(true);
     })();

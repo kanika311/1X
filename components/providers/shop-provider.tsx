@@ -70,6 +70,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     if (!isRegisteredUser(session)) {
       setWishlist([]);
       setCart([]);
+      setShopError(null);
       return;
     }
     setShopLoading(true);
@@ -80,7 +81,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       setWishlist([]);
       setCart([]);
-      handleShopError(e);
+      const message = e instanceof Error ? e.message.toLowerCase() : "";
+      if (message.includes("not authorized") || message.includes("not signed in")) {
+        setShopError(null);
+      } else {
+        handleShopError(e);
+      }
     } finally {
       setShopLoading(false);
     }

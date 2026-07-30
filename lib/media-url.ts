@@ -28,11 +28,7 @@ export function resolveApiMediaUrl(url: string | undefined | null): string {
 
   if (trimmed.startsWith("/uploads/")) return trimmed;
 
-  if (/^https?:\/\//i.test(trimmed)) {
-    return sanitizeMediaSrc(trimmed);
-  }
-
-  return trimmed;
+  return sanitizeMediaSrc(trimmed);
 }
 
 export function resolveApiMediaUrlOrFallback(url: string | undefined | null): string {

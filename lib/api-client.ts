@@ -10,8 +10,10 @@ export function setAuthToken(_token: string | null) {
   /* Tokens are stored in httpOnly cookies — not accessible from JavaScript. */
 }
 
-async function refreshSessionIfNeeded(res: Response): Promise<boolean> {
+async function refreshSessionIfNeeded(res: Response, path: string): Promise<boolean> {
   if (res.status !== 401) return false;
+  // Session probe — 401 means logged out; don't chain another failing refresh call.
+  if (path === "/auth/me" || path.endsWith("/auth/me")) return false;
   const refreshRes = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
     method: "POST",
     credentials: FETCH_CREDENTIALS,
@@ -37,7 +39,7 @@ export async function apiRequest<T>(
   }
 
   if (auth && res.status === 401) {
-    const refreshed = await refreshSessionIfNeeded(res);
+    const refreshed = await refreshSessionIfNeeded(res, path);
     if (refreshed) {
       res = await fetch(url, { ...rest, headers: h, credentials: FETCH_CREDENTIALS });
     }
